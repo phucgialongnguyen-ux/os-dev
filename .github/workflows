@@ -1,0 +1,36 @@
+name: Build Kernel ISO
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-iso:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install Toolchain and GRUB
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-multilib g++-multilib grub-pc-bin xorriso
+
+    - name: Compile Kernel and Create ISO
+      run: |
+        as --32 boot.s -o boot.o
+        g++ -m32 -c kernel.cpp -o kernel.o -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore
+        ld -m elf_i386 -T linker.ld -o myos.bin boot.o kernel.o
+        mkdir -p isodir/boot/grub
+        cp myos.bin isodir/boot/myos.bin
+        cp grub.cfg isodir/boot/grub/grub.cfg
+        grub-mkrescue -o myOS.iso isodir
+
+    - name: Upload ISO Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: myOS-image
+        path: myOS.iso
