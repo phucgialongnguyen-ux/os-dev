@@ -44,7 +44,7 @@ class Screen{
 
 Screen print;
 
-extern "C" void _start(){
+extern "C" void kernel_main(){
 	print.Color(0x0A);
 	print << "Hello World!!!!! \n";
 	print.RestoreColor();
