@@ -16,7 +16,7 @@ class Screen{
 		}
 		Screen& operator<<(const char* text){
 			for(int i = 0 ; text[i] != '\0'; i++ ){
-				if(text[i] == '\n' ){
+				if(text[i] == '\\' ){
 					curr_pos = (curr_pos / 160 + 1) * 160;
 					continue;
 				}
@@ -46,7 +46,9 @@ Screen print;
 
 extern "C" void kernel_main(){
 	print.Color(0x0A);
-	print << "Hello World!!!!! \n";
+	print << "Hello World!\\";
 	print.RestoreColor();
-	while(1){}
+	while(1){
+		asm volatile("htl");
+	}
 }
