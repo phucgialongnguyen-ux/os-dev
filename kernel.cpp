@@ -49,6 +49,6 @@ extern "C" void kernel_main(){
 	print << "Hello World!\\";
 	print.RestoreColor();
 	while(1){
-		asm volatile("htl");
+		asm volatile("hlt");
 	}
 }
