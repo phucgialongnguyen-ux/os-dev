@@ -34,7 +34,7 @@ class Screen{
 				*this << "Chuong Trinh Beo Qua";
 				return;
 			}
-			for(int Cleaner = 0; Cleaner < Cleaner_limit; Cleaner++){
+			for(int Cleaner = 0; Cleaner < Cleaner_limit; Cleaner+= 2){
 				vga_display[Cleaner] = ' ';
 				vga_display[Cleaner + 1] = 0x07;
 			}
@@ -42,9 +42,8 @@ class Screen{
 			}
 };
 
-Screen print;
-
 extern "C" void kernel_main(){
+	Screen print;
 	print.Color(0x0A);
 	print << "Hello World!\\";
 	print.RestoreColor();
