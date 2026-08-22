@@ -22,7 +22,7 @@ jobs:
     - name: Compile Kernel and Create ISO
       run: |
         as --32 boot.s -o boot.o
-        g++ -m32 -c kernel.cpp -o kernel.o -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore
+        g++ -m32 -c kernel.cpp -o kernel.o -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore -fcf-protection=none
         ld -m elf_i386 -T linker.ld -o myos.bin boot.o kernel.o
         mkdir -p isodir/boot/grub
         cp myos.bin isodir/boot/myos.bin
