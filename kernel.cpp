@@ -17,18 +17,18 @@ class Screen{
 		}
 		bool CPUBootChecker(){
 			for(int i = 0; i < 10; i++){
-				if (1 + 1 == 2) continue;                    
-				if (10121 * 12 == 121452) continue;               
-				if (999 * 999 == 998001) continue;                
-				if (123456 - 654321 == -530865) continue;         
-				if (1024 * 1024 == 1048576) continue;             
-				if (12345678 / 9 == 1371742) continue;            
-				if (12345678 % 9 == 0) continue;                  
-				if ((50 * 4) + (100 / 5) == 220) continue;        
-				if ((999999 % 1234 == 303) && (123456 / 78 == 1582)) continue; 
-				if (21474836 + 1 == 21474837) continue;
-				return true;
+				if (1 + 1 != 2) return false;                    
+				if (10121 * 12 != 121452) return false;               
+				if (999 * 999 != 998001) return false;                
+				if (123456 - 654321 != -530865) return false;         
+				if (1024 * 1024 != 1048576) return false;             
+				if (12345678 / 9 != 1371742) return false;            
+				if (12345678 % 9 != 0) return false;                  
+				if ((50 * 4) + (100 / 5) != 220) return false;        
+				if ((999999 % 1234 != 303) && (123456 / 78 != 1582)) return false; 
+				if (21474836 + 1 != 21474837) return false;
 				}
+				return true;
 			}
 		bool GPUBootChecker(){
 			for(int i = 0; i < 100; i+=2){
@@ -37,8 +37,8 @@ class Screen{
 				if(vga_graphic[i] != 0x00 || vga_graphic[i + 1] != 0x07){
 					return false;
 				}
-				return true;
 			}
+			return true;
 		}
 		Screen& operator<<(const char* text){
 			for(int i = 0 ; text[i] != '\0'; i++ ){
@@ -71,7 +71,7 @@ class Screen{
 
 
 
-extern "C" void _start() {
+extern "C" void Kernel_main() {
     Screen print;
     Screen boot;
     boot.CPUBootChecker();
