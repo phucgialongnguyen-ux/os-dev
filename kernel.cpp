@@ -37,7 +37,7 @@ class Screen{
 				if(vga_graphic[i] != 0x00 || vga_graphic[i + 1] != 0x07){
 					return false;
 				}
-			}My
+			}
 			return true;
 		}
 		Screen& operator<<(const char* text){
