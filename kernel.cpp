@@ -71,7 +71,7 @@ class Screen{
 
 
 
-extern "C" void Kernel_main() {
+extern "C" void kernel_main() {
     Screen print;
     Screen boot;
     boot.CPUBootChecker();
