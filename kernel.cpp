@@ -91,6 +91,9 @@ extern "C" void kernel_main() {
     print << "However, if you end up frying your chip or blowing up a component, that's\n";
     print << "completely on you!! I am not responsible for any broken hardware or lost\n";
     print << "data.\n";
+	print.RestoreColor();
+	
+	print.Color(0x0E);
     print << "Remember you own the machine, you own everything!!!!\n";
     print.RestoreColor();
 
