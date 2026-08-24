@@ -108,7 +108,7 @@ class Screen{
 					continue;
 				}
 				if(text[i] == '\b'){
-					if(curr_pos >= 2){
+					if(curr_pos >= 2 && curr_pos % 160 != 0){
 						curr_pos -= 2;
 						vga_display[curr_pos] = ' ';
 						vga_display[curr_pos + 1] = 0x07;
@@ -153,9 +153,6 @@ class Screen{
 			curr_pos = 0;
 			}
 };
-
-
-
 extern "C" void kernel_main() {
     Screen print;
     Screen boot;
@@ -169,26 +166,24 @@ extern "C" void kernel_main() {
     print << "Hello World!!!!!! \n";
     print.RestoreColor();
 
-    print.Color(0x0C);
-    print << "\t [ WARNING : MYOS UNRESTRICTED CORE ACCESS ] \n";
-    print << "Hey! WELCOME TO MYOS.\n";
-    print << "Just a heads up before you jump in: This OS gives you 100% control over your\n";
-    print << "hardwaressss. No restrictions, no protective limits, no hand-holding.\n";
-    print << "\n";
-    print << "You can push the CPU, tweak the GPU, or mess with RAM directly if you want!\n";
-    print << "However, if you end up frying your chip or blowing up a component, that's\n";
-    print << "completely on you!! I am not responsible for any broken hardware or lost\n";
-    print << "data.\n";
-    print.RestoreColor();
-    print.Color(0x0E);
-    print << "Remember you own the machine, you own everything!!!!\n";
-    print.RestoreColor();
-
+    //print.Color(0x0C);
+    //print << "\t [ WARNING : MYOS UNRESTRICTED CORE ACCESS ] \n";
+    //print << "Hey! WELCOME TO MYOS.\n";
+    //print << "Just a heads up before you jump in: This OS gives you 100% control over your\n";
+    //print << "hardwaressss. No restrictions, no protective limits, no hand-holding.\n";
+    //print << "\n";
+    //print << "You can push the CPU, tweak the GPU, or mess with RAM directly if you want!\n";
+    //print << "However, if you end up frying your chip or blowing up a component, that's\n";
+    //print << "completely on you!! I am not responsible for any broken hardware or lost\n";
+    //print << "data.\n";
+    //print.RestoreColor();
+    //print.Color(0x0E);
+    //print << "Remember you own the machine, you own everything!!!!\n";
+    //print.RestoreColor();
+	for(volatile int i = 0; i < 50000000; i++){}
     print.Color(0x0A);
     print << "Write something! \n";
     print.RestoreColor();
-
-	
     while(1) {
 		char text = Screen::KeyBoard_Driver();
 		if(text != 0){
