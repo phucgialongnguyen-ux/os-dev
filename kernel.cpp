@@ -63,9 +63,7 @@ class Screen{
 				if ((999999 % 1234 != 723) && (123456 / 78 != 1582)) return false; 
 				if (21474836 + 1 != 21474837) return false;
 				}
-				for(volatile int timer = 0; timer < 250; timer++){
-					__asm__("hlt");
-				}
+				for(volatile int timer = 0; timer < 50000000; timer++){}
 				return true;
 			}
 		bool GPUBootChecker(){
@@ -76,9 +74,7 @@ class Screen{
 					return false;
 				}
 			}
-			for(volatile int i = 0; i < 250; i++){
-				__asm__("hlt");
-			}
+			for(volatile int i = 0; i < 50000000; i++){}
 			return true;
 		}
 		static inline unsigned char input(unsigned short port){
