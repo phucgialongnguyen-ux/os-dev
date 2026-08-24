@@ -111,11 +111,10 @@ class Screen{
 					if(curr_pos >= 2){
 						curr_pos -= 2;
 						vga_display[curr_pos] = ' ';
-						vga_display[curr_color + 1] = 0x07;
+						vga_display[curr_pos + 1] = 0x07;
 					}
 					continue;
 				}
-				
 				vga_display[curr_pos] = text[i];
 				vga_display[curr_pos + 1] = curr_color;
 				curr_pos += 2;
