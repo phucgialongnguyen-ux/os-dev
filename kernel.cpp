@@ -63,7 +63,6 @@ class Screen{
 				if ((999999 % 1234 != 723) && (123456 / 78 != 1582)) return false; 
 				if (21474836 + 1 != 21474837) return false;
 				}
-				for(volatile int timer = 0; timer < 50000000; timer++){}
 				return true;
 			}
 		bool GPUBootChecker(){
@@ -74,7 +73,6 @@ class Screen{
 					return false;
 				}
 			}
-			for(volatile int i = 0; i < 50000000; i++){}
 			return true;
 		}
 		static inline unsigned char input(unsigned short port){
@@ -125,7 +123,7 @@ class Screen{
 		}
 		void LoadingScreen(){
 			 unsigned char dot[] = {'.', '.', '.'};
-			 while(CPUBootChecker() == false || GPUBootChecker() == false){
+			 while(CPUBootChecker() == true || GPUBootChecker() == true){
 			 for(volatile int i = 0; i < 3; i++){
 				vga_display[curr_pos] = '.';
 				vga_display[curr_pos + 1] = 0x05;
@@ -137,6 +135,7 @@ class Screen{
 				vga_display[curr_pos + 1] = 0x07;
 				 }
 			}
+			for(volatile int i = 0; i < 50000000; i++){}
 		}
 		void RestoreColor(){
 			curr_color = 0x07;
