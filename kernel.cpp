@@ -161,6 +161,8 @@ extern "C" void kernel_main() {
     Screen boot;
 	Screen clean;
     
+	boot.LoadingScreen();
+
     boot.CPUBootChecker();
     boot.GPUBootChecker();
 
