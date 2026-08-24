@@ -51,7 +51,7 @@ class Screen{
 			curr_color = color;
 		}
 		bool CPUBootChecker(){
-			for(int i = 0; i < 10; i++){
+			for(volatile int i = 0; i < 10; i++){
 				if (1 + 1 != 2) return false;                    
 				if (10121 * 12 != 121452) return false;               
 				if (999 * 999 != 998001) return false;                
@@ -63,15 +63,21 @@ class Screen{
 				if ((999999 % 1234 != 723) && (123456 / 78 != 1582)) return false; 
 				if (21474836 + 1 != 21474837) return false;
 				}
+				for(volatile int timer = 0; timer < 250; timer++){
+					__asm__("hlt");
+				}
 				return true;
 			}
 		bool GPUBootChecker(){
-			for(int i = 0; i < 100; i+=2){
+			for(volatile int i = 0; i < 100; i+=2){
 				vga_graphic[i] = 0x00;
 				vga_graphic[i + 1] = 0x07;
 				if(vga_graphic[i] != 0x00 || vga_graphic[i + 1] != 0x07){
 					return false;
 				}
+			}
+			for(volatile int i = 0; i < 250; i++){
+				__asm__("hlt");
 			}
 			return true;
 		}
@@ -120,6 +126,21 @@ class Screen{
 				curr_pos += 2;
 			}
 			return *this;
+		}
+		void LoadingScreen(){
+			 unsigned char dot[] = {'.', '.', '.'};
+			 while(CPUBootChecker() == false || GPUBootChecker() == false){
+			 for(volatile int i = 0; i < 3; i++){
+				vga_display[curr_pos] = '.';
+				vga_display[curr_pos + 1] = 0x05;
+				curr_pos += 2;
+			 }
+			 for(volatile int i = 0; i < 3; i++){
+				curr_pos -= 2;
+				vga_display[curr_pos] = ' ';
+				vga_display[curr_pos + 1] = 0x07;
+				 }
+			}
 		}
 		void RestoreColor(){
 			curr_color = 0x07;
