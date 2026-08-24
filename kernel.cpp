@@ -135,7 +135,7 @@ class Screen{
 				vga_display[curr_pos + 1] = 0x07;
 				}
 			}
-			for(volatile int i = 0; i < 50000000; i++){}
+			for(volatile int i = 0; i < 30000000; i++){}
 		}
 		void RestoreColor(){
 			curr_color = 0x07;
