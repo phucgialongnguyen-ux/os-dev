@@ -123,19 +123,19 @@ class Screen{
 		}
 		void LoadingScreen(){
 			 unsigned char dot[] = {'.', '.', '.'};
-			 while(CPUBootChecker() == true || GPUBootChecker() == true){
-			 for(volatile int i = 0; i < 3; i++){
+			 while(CPUBootChecker() == true && GPUBootChecker() == true){
+			 for(int i = 0; i < 3; i++){
 				vga_display[curr_pos] = '.';
 				vga_display[curr_pos + 1] = 0x05;
 				curr_pos += 2;
 			 }
-			 for(volatile int i = 0; i < 3; i++){
+			 for(int i = 0; i < 3; i++){
 				curr_pos -= 2;
 				vga_display[curr_pos] = ' ';
 				vga_display[curr_pos + 1] = 0x07;
 				}
 			}
-			for(volatile int i = 0; i < 30000000; i++){}
+			for(volatile int i = 0; i < 50000000; i++){}
 		}
 		void RestoreColor(){
 			curr_color = 0x07;
@@ -161,10 +161,9 @@ extern "C" void kernel_main() {
     Screen boot;
 	Screen clean;
     
-	boot.LoadingScreen();
-
     boot.CPUBootChecker();
     boot.GPUBootChecker();
+	boot.LoadingScreen();
 
     print.Color(0x0A);
     print << "Hello World!!!!!! \n";
