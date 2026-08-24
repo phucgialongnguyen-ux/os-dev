@@ -107,6 +107,15 @@ class Screen{
 					curr_pos = (curr_pos / 160 + 1) * 160;
 					continue;
 				}
+				if(text[i] == '\b'){
+					if(curr_pos >= 2){
+						curr_pos -= 2;
+						vga_display[curr_pos] = ' ';
+						vga_display[curr_color + 1] = 0x07;
+					}
+					continue;
+				}
+				
 				vga_display[curr_pos] = text[i];
 				vga_display[curr_pos + 1] = curr_color;
 				curr_pos += 2;
@@ -121,7 +130,7 @@ class Screen{
 				*this << "Chuong Trinh Beo Qua!";
 				return;
 			}
-			for(int Cleaner = 0; Cleaner < Cleaner_limit; Cleaner++){
+			for(int Cleaner = 0; Cleaner < Cleaner_limit; Cleaner+=2){
 				vga_display[Cleaner] = ' ';
 				vga_display[Cleaner + 1] = 0x07;
 				 
@@ -135,6 +144,7 @@ class Screen{
 extern "C" void kernel_main() {
     Screen print;
     Screen boot;
+	Screen clean;
     
     boot.CPUBootChecker();
     boot.GPUBootChecker();
