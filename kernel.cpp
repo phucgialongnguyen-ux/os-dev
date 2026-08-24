@@ -133,7 +133,7 @@ class Screen{
 				curr_pos -= 2;
 				vga_display[curr_pos] = ' ';
 				vga_display[curr_pos + 1] = 0x07;
-				 }
+				}
 			}
 			for(volatile int i = 0; i < 50000000; i++){}
 		}
