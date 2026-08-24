@@ -96,7 +96,7 @@ class Screen{
 			    }
 			    unsigned char character;
 			    character = input(0x60);
-				if(character < 128){
+				if(character <= 128){
 					return Scan_Code[character];
 				}
 				return 0;				
