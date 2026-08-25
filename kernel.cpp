@@ -180,6 +180,10 @@ extern "C" void kernel_main() {
     
     boot.CPUBootChecker();
     boot.GPUBootChecker();
+	
+	if((boot.CPUBootChecker() || boot.GPUBootChecker()) == false){
+		return;
+	}
 
     print.Color(0x0A);
     print << "Hello World!!!!!! \n";
