@@ -51,7 +51,7 @@ class Screen{
 			curr_color = color;
 		}
 		bool CPUBootChecker(){
-			for(volatile int i = 0; i < 10; i++){
+			for(int i = 0; i < 10; i++){
 				if (1 + 1 != 2) return false;                    
 				if (10121 * 12 != 121452) return false;               
 				if (999 * 999 != 998001) return false;                
@@ -66,10 +66,11 @@ class Screen{
 				return true;
 			}
 		bool GPUBootChecker(){
-			for(volatile int i = 0; i < 100; i+=2){
+			for(int i = 0; i < 30000; i+=2){
 				vga_graphic[i] = 0x00;
 				vga_graphic[i + 1] = 0x07;
 				if(vga_graphic[i] != 0x00 || vga_graphic[i + 1] != 0x07){
+					*this << "GPUBootChecker Failed";
 					return false;
 				}
 			}
@@ -83,59 +84,79 @@ class Screen{
 		static inline void output(unsigned short port, unsigned char val){
 			asm volatile("outb %0, %1" :: "a"(val), "Nd"(port));
 		}
+		void Speaker(){
+			
+		}
 		static char KeyBoard_Driver(){ 
 			static constexpr unsigned char Scan_Code[] = {
 			    0,   27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
 			    '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
 			    0,  'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',
 			    0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',   0,
-			    '*',    0, ' '
+			    '*',    0, ' ' 
 			    };
 			    if((input(0x64) & 1) == 0){
 			    	return 0;
 			    }
-			    unsigned char character;
-			    character = input(0x60);
-				if(character <= 128){
-					return Scan_Code[character];
+			    unsigned char Character;
+			    Character = input(0x60);
+				if(Character < 128){
+					return Scan_Code[Character];
 				}
-				return 0;				
+			return 0;				
 		}
+	static unsigned char Keyboard_Extended(){
+		static constexpr unsigned char Extended_Scan_Code[] = {
+			0x48, 0x50, 0x4B, 0x4D
+		};
+		if((input(0x64) & 1) == 0){
+			return 0;
+		}
+		unsigned char Extended_Character = input(0x60);
+		for(int i = 0; i <= 3; i++){
+			if(Extended_Character == Extended_Scan_Code[i]){
+				return 	Extended_Scan_Code[i];
+			}
+		}
+		return 0;
+	}
 		Screen& operator<<(const char* text){
 			for(int i = 0 ; text[i] != '\0'; i++ ){
 				if(text[i] == '\n' ){
 					curr_pos = (curr_pos / 160 + 1) * 160;
 					continue;
 				}
-				if(text[i] == '\b'){
-					if(curr_pos >= 2 && curr_pos % 160 != 0){
-						curr_pos -= 2;
-						vga_display[curr_pos] = ' ';
-						vga_display[curr_pos + 1] = 0x07;
-					}
+				if(text[i] == '\b' && text[i] % 160 != 0){
+					curr_pos -=2;
+					vga_display[curr_pos] = ' ';
+					vga_display[curr_pos + 1] = 0x07;
 					continue;
+				}
+				if(text[i] == (const char)0xE0 && text[i] == 0x48){
+					if(curr_pos >= 160)curr_pos -= 160;
+					continue;
+					i++;
+				}
+				if(text[i] == (const char)0xE0 && text[i] == 0x50){
+					if(curr_pos < 3840)curr_pos += 160;
+					continue;
+					i++;
+				}
+				if(text[i] == (const char)0xE0 && text[i] == 0x4B){
+					if(curr_pos >= 2)curr_pos += 2;
+					continue;
+					i++;
+				}
+				if(text[i] == (const char)0xE0 && text[i] == 0x4D){
+					if(curr_pos < 3998)curr_pos -= 2;
+					continue;
+					i++;
 				}
 				vga_display[curr_pos] = text[i];
 				vga_display[curr_pos + 1] = curr_color;
 				curr_pos += 2;
 			}
 			return *this;
-		}
-		void LoadingScreen(){
-			 unsigned char dot[] = {'.', '.', '.'};
-			 while(CPUBootChecker() == true && GPUBootChecker() == true){
-			 for(int i = 0; i < 3; i++){
-				vga_display[curr_pos] = '.';
-				vga_display[curr_pos + 1] = 0x05;
-				curr_pos += 2;
-			 }
-			 for(int i = 0; i < 3; i++){
-				curr_pos -= 2;
-				vga_display[curr_pos] = ' ';
-				vga_display[curr_pos + 1] = 0x07;
-				}
-			}
-			for(volatile int i = 0; i < 50000000; i++){}
 		}
 		void RestoreColor(){
 			curr_color = 0x07;
@@ -145,7 +166,7 @@ class Screen{
 				*this << "Chuong Trinh Beo Qua!";
 				return;
 			}
-			for(int Cleaner = 0; Cleaner < Cleaner_limit; Cleaner+=2){
+			for(int Cleaner = 0; Cleaner < Cleaner_limit; Cleaner++){
 				vga_display[Cleaner] = ' ';
 				vga_display[Cleaner + 1] = 0x07;
 				 
@@ -156,34 +177,33 @@ class Screen{
 extern "C" void kernel_main() {
     Screen print;
     Screen boot;
-	Screen clean;
     
     boot.CPUBootChecker();
     boot.GPUBootChecker();
-	boot.LoadingScreen();
 
     print.Color(0x0A);
     print << "Hello World!!!!!! \n";
     print.RestoreColor();
 
-    //print.Color(0x0C);
-    //print << "\t [ WARNING : MYOS UNRESTRICTED CORE ACCESS ] \n";
-    //print << "Hey! WELCOME TO MYOS.\n";
-    //print << "Just a heads up before you jump in: This OS gives you 100% control over your\n";
-    //print << "hardwaressss. No restrictions, no protective limits, no hand-holding.\n";
-    //print << "\n";
-    //print << "You can push the CPU, tweak the GPU, or mess with RAM directly if you want!\n";
-    //print << "However, if you end up frying your chip or blowing up a component, that's\n";
-    //print << "completely on you!! I am not responsible for any broken hardware or lost\n";
-    //print << "data.\n";
-    //print.RestoreColor();
-    //print.Color(0x0E);
-    //print << "Remember you own the machine, you own everything!!!!\n";
-    //print.RestoreColor();
-	for(volatile int i = 0; i < 50000000; i++){}
+    print.Color(0x0C);
+    print << "\t [ WARNING : MYOS UNRESTRICTED CORE ACCESS ] \n";
+    print << "Hey! WELCOME TO MYOS.\n";
+    print << "Just a heads up before you jump in: This OS gives you 100% control over your\n";
+    print << "hardwaressss. No restrictions, no protective limits, no hand-holding.\n";
+    print << "\n";
+    print << "You can push the CPU, tweak the GPU, or mess with RAM directly if you want!\n";
+    print << "However, if you end up frying your chip or blowing up a component, that's\n";
+    print << "completely on you!! I am not responsible for any broken hardware or lost\n";
+    print << "data.\n";
+    print.RestoreColor();
+    print.Color(0x0E);
+    print << "Remember you own the machine, you own everything!!!!\n";
+    print.RestoreColor();
+
     print.Color(0x0A);
     print << "Write something! \n";
     print.RestoreColor();
+	
     while(1) {
 		char text = Screen::KeyBoard_Driver();
 		if(text != 0){
