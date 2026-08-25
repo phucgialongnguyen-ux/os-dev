@@ -70,7 +70,7 @@ class Screen{
 				vga_graphic[i] = 0x00;
 				vga_graphic[i + 1] = 0x07;
 				if(vga_graphic[i] != 0x00 || vga_graphic[i + 1] != 0x07){
-					*this << "GPUBootChecker Failed";
+					*this << "GPUBootChecker Failed \n";
 					return false;
 				}
 			}
@@ -179,9 +179,9 @@ extern "C" void kernel_main() {
     Screen boot;
     
     boot.CPUBootChecker();
-    boot.GPUBootChecker();
+    //boot.GPUBootChecker();
 	
-	if((boot.CPUBootChecker() || boot.GPUBootChecker()) == false){
+	if(boot.CPUBootChecker() == false){
 		return;
 	}
 
