@@ -7,6 +7,7 @@ __attribute__((section(".multiboot"))) const unsigned int boot_checksum[]{
 class Screen{
 	private:
 		volatile char* vga_display  = (volatile char*)0xB8000; 
+		int curr_pos = 0;
 		char curr_color = 0x07;
 		volatile char* vga_graphic = (volatile char*)0xA0000;
 		static constexpr unsigned char ASCII_Control_Character_Table[] = {
@@ -46,7 +47,6 @@ class Screen{
 			0xFE, 0xFF
 		};
 	public:
-		inline static int curr_pos;
 		void Color(char color){
 			curr_color = color;
 		}
@@ -70,7 +70,7 @@ class Screen{
 				vga_graphic[i] = 0x00;
 				vga_graphic[i + 1] = 0x07;
 				if(vga_graphic[i] != 0x00 || vga_graphic[i + 1] != 0x07){
-					*this << "GPUBootChecker Failed \n";
+					*this << "GPUBootChecker Failed";
 					return false;
 				}
 			}
@@ -84,43 +84,21 @@ class Screen{
 		static inline void output(unsigned short port, unsigned char val){
 			asm volatile("outb %0, %1" :: "a"(val), "Nd"(port));
 		}
-		void Speaker(){
-			
-		}
-		static char Keyboard_Driver(){ 
-			static constexpr unsigned char Scan_Code[] = {
-			    0,   27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
-			    '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
-			    0,  'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',
-			    0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',   0,
-			    '*',    0, ' ' 
-			    };
-			    if((input(0x64) & 1) == 0){
-			    	return 0;
-			    }
-			    unsigned char Character;
-			    Character = input(0x60);
-				if(Character < 128){
-					return Scan_Code[Character];
-				}
-			return 0;				
-		}
-	static unsigned char Keyboard_Extended_Driver(){
-		static constexpr unsigned char Extended_Scan_Code[] = {
-			0x48, 0x50, 0x4B, 0x4D
+		static constexpr unsigned char Scanner[128] = {
+			0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
+			'\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
+			0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',
+			0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0,
+			'*', 0, ' '
 		};
-		if((input(0x64) & 1) == 0){
-			return 0;
-		}
-		unsigned char Extended_Character = input(0x60);
-		for(int i = 0; i <= 3; i++){
-			if(Extended_Character == Extended_Scan_Code[i]){
-				return 	Extended_Scan_Code[i];
+		static unsigned char Keyboard_Driver(){
+			unsigned char character = input(0x60);
+			if(character < 128){
+				return Scanner[character];
 			}
-		}
-		return 0;
-	}
-		Screen& operator<<(const char* text){
+			return 0;
+		}	
+			Screen& operator<<(const char* text){
 			for(int i = 0 ; text[i] != '\0'; i++ ){
 				if(text[i] == '\n' ){
 					curr_pos = (curr_pos / 160 + 1) * 160;
@@ -179,41 +157,37 @@ extern "C" void kernel_main() {
     Screen boot;
     
     boot.CPUBootChecker();
-    //boot.GPUBootChecker();
-	
-	if(boot.CPUBootChecker() == false){
-		return;
-	}
+    boot.GPUBootChecker();
 
     print.Color(0x0A);
     print << "Hello World!!!!!! \n";
     print.RestoreColor();
 
-    //print.Color(0x0C);
-    //print << "\t [ WARNING : MYOS UNRESTRICTED CORE ACCESS ] \n";
-    //print << "Hey! WELCOME TO MYOS.\n";
-    //print << "Just a heads up before you jump in: This OS gives you 100% control over your\n";
-    //print << "hardwaressss. No restrictions, no protective limits, no hand-holding.\n";
-    //print << "\n";
-    //print << "You can push the CPU, tweak the GPU, or mess with RAM directly if you want!\n";
-    //print << "However, if you end up frying your chip or blowing up a component, that's\n";
-    //print << "completely on you!! I am not responsible for any broken hardware or lost\n";
-    //print << "data.\n";
-    //print.RestoreColor();
-    //print.Color(0x0E);
-    //print << "Remember you own the machine, you own everything!!!!\n";
-    //print.RestoreColor();
+    print.Color(0x0C);
+    print << "\t [ WARNING : MYOS UNRESTRICTED CORE ACCESS ] \n";
+    print << "Hey! WELCOME TO MYOS.\n";
+    print << "Just a heads up before you jump in: This OS gives you 100% control over your\n";
+    print << "hardwaressss. No restrictions, no protective limits, no hand-holding.\n";
+    print << "\n";
+    print << "You can push the CPU, tweak the GPU, or mess with RAM directly if you want!\n";
+    print << "However, if you end up frying your chip or blowing up a component, that's\n";
+    print << "completely on you!! I am not responsible for any broken hardware or lost\n";
+    print << "data.\n";
+    print.RestoreColor();
+    print.Color(0x0E);
+    print << "Remember you own the machine, you own everything!!!!\n";
+    print.RestoreColor();
 
     print.Color(0x0A);
     print << "Write something! \n";
     print.RestoreColor();
 	
-    while(1) {
-		char text2 = Screen::Keyboard_Extended_Driver();
-		char text = Screen::Keyboard_Driver();
-		if(text != 0){
-			char str[] = {text, '\0'};
-			print << str;
-		}
+    while(0){
+    	char text = Screen::Keyboard_Driver();
+    	if(text != 0){
+    		char str[] = {text, '\0'};
+    		print << str;
+    	}
+
     }
 }
