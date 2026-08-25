@@ -7,7 +7,6 @@ __attribute__((section(".multiboot"))) const unsigned int boot_checksum[]{
 class Screen{
 	private:
 		volatile char* vga_display  = (volatile char*)0xB8000; 
-		int curr_pos = 0;
 		char curr_color = 0x07;
 		volatile char* vga_graphic = (volatile char*)0xA0000;
 		static constexpr unsigned char ASCII_Control_Character_Table[] = {
@@ -47,6 +46,7 @@ class Screen{
 			0xFE, 0xFF
 		};
 	public:
+		inline static int curr_pos;
 		void Color(char color){
 			curr_color = color;
 		}
@@ -87,7 +87,7 @@ class Screen{
 		void Speaker(){
 			
 		}
-		static char KeyBoard_Driver(){ 
+		static char Keyboard_Driver(){ 
 			static constexpr unsigned char Scan_Code[] = {
 			    0,   27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
 			    '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
@@ -105,7 +105,7 @@ class Screen{
 				}
 			return 0;				
 		}
-	static unsigned char Keyboard_Extended(){
+	static unsigned char Keyboard_Extended_Driver(){
 		static constexpr unsigned char Extended_Scan_Code[] = {
 			0x48, 0x50, 0x4B, 0x4D
 		};
@@ -185,27 +185,35 @@ extern "C" void kernel_main() {
     print << "Hello World!!!!!! \n";
     print.RestoreColor();
 
-    print.Color(0x0C);
-    print << "\t [ WARNING : MYOS UNRESTRICTED CORE ACCESS ] \n";
-    print << "Hey! WELCOME TO MYOS.\n";
-    print << "Just a heads up before you jump in: This OS gives you 100% control over your\n";
-    print << "hardwaressss. No restrictions, no protective limits, no hand-holding.\n";
-    print << "\n";
-    print << "You can push the CPU, tweak the GPU, or mess with RAM directly if you want!\n";
-    print << "However, if you end up frying your chip or blowing up a component, that's\n";
-    print << "completely on you!! I am not responsible for any broken hardware or lost\n";
-    print << "data.\n";
-    print.RestoreColor();
-    print.Color(0x0E);
-    print << "Remember you own the machine, you own everything!!!!\n";
-    print.RestoreColor();
+    //print.Color(0x0C);
+    //print << "\t [ WARNING : MYOS UNRESTRICTED CORE ACCESS ] \n";
+    //print << "Hey! WELCOME TO MYOS.\n";
+    //print << "Just a heads up before you jump in: This OS gives you 100% control over your\n";
+    //print << "hardwaressss. No restrictions, no protective limits, no hand-holding.\n";
+    //print << "\n";
+    //print << "You can push the CPU, tweak the GPU, or mess with RAM directly if you want!\n";
+    //print << "However, if you end up frying your chip or blowing up a component, that's\n";
+    //print << "completely on you!! I am not responsible for any broken hardware or lost\n";
+    //print << "data.\n";
+    //print.RestoreColor();
+    //print.Color(0x0E);
+    //print << "Remember you own the machine, you own everything!!!!\n";
+    //print.RestoreColor();
 
     print.Color(0x0A);
     print << "Write something! \n";
     print.RestoreColor();
 	
     while(1) {
-		char text = Screen::KeyBoard_Driver();
+		char text2 = Screen::Keyboard_Extended_Driver();
+    	if (text2 != 0) {
+        if (text2 == 0x48 && Screen::curr_pos >= 160)  Screen::curr_pos -= 160; 
+        if (text2 == 0x50 && Screen::curr_pos < 3840) Screen::curr_pos += 160;
+        if (text2 == 0x4B && Screen::curr_pos >= 2)    Screen::curr_pos -= 2;   
+        if (text2 == 0x4D && Screen::curr_pos < 3998) Screen::curr_pos += 2;   
+		continue; 
+    }
+		char text = Screen::Keyboard_Driver();
 		if(text != 0){
 			char str[] = {text, '\0'};
 			print << str;
