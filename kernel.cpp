@@ -208,13 +208,15 @@ extern "C" void kernel_main() {
     print << "Write something! \n";
     print.RestoreColor();
 	
-    while(1) {
+	int i = 1;
+    while(i = 1) {
 		char text2 = Screen::Keyboard_Extended_Driver();
     	if (text2 != 0) {
         if (text2 == 0x48 && Screen::curr_pos >= 160)  Screen::curr_pos -= 160; 
         if (text2 == 0x50 && Screen::curr_pos < 3840) Screen::curr_pos += 160;
         if (text2 == 0x4B && Screen::curr_pos >= 2)    Screen::curr_pos -= 2;   
-        if (text2 == 0x4D && Screen::curr_pos < 3998) Screen::curr_pos += 2;   
+        if (text2 == 0x4D && Screen::curr_pos < 3998) Screen::curr_pos += 2;
+		i++;
 		continue; 
     }
 		char text = Screen::Keyboard_Driver();
