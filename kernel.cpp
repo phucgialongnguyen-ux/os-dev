@@ -100,7 +100,7 @@ class Screen{
         };
 
         static unsigned char Keyboard_Driver(){
-			if((input(0x61) & 1) == 0){
+			if((input(0x64) & 1) == 0){
 				return 0;
 			}
             unsigned char character = input(0x60);
