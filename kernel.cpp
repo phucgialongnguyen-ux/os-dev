@@ -100,6 +100,9 @@ class Screen{
         };
 
         static unsigned char Keyboard_Driver(){
+			if((input(0x61) & 1) == 0){
+				return 0;
+			}
             unsigned char character = input(0x60);
             if(character < 128){
                 return Scanner[character];
@@ -170,9 +173,9 @@ extern "C" void kernel_main() {
     //print << "data.\n";
     //print.RestoreColor();
 
-    print.Color(0x0E);
-    print << "Remember you own the machine, you own everything!!!!\n";
-    print.RestoreColor();
+    //print.Color(0x0E);
+    //print << "Remember you own the machine, you own everything!!!!\n";
+    //print.RestoreColor();
 
     print.Color(0x0A);
     print << "Write something! \n";
