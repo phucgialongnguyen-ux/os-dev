@@ -98,17 +98,13 @@ class Screen{
             0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0,
             '*', 0, ' '
         };
-
-        static unsigned char Keyboard_Driver(){
-			if((input(0x64) & 1) == 0){
-				return 0;
-			}
-            unsigned char character = input(0x60);
-            if(character < 128){
-                return Scanner[character];
-            }
-            return 0;
-        }   
+        static constexpr unsigned char Scanner_Shift[128] = {
+            0, 27, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b',
+            '\t', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n',
+            0, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '\"', '~',
+            0, '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', 0,
+            '*', 0, ' '
+        };
 
         Screen& operator<<(const char* text){
             for(int i = 0 ; text[i] != '\0'; i++ ){
@@ -145,6 +141,37 @@ class Screen{
             }
             curr_pos = 0;
         }
+
+        static unsigned char Keyboard_Driver_Shift(){
+            if((input(0x64) & 1) == 0){
+                return 0;
+            }
+
+            static bool is_Shift = false;
+            unsigned char ScancodeShift = input(0x60);
+
+            if(ScancodeShift == 0x2A || ScancodeShift == 0x36){
+                is_Shift = true;
+                return 0;
+            }
+
+            if(ScancodeShift == 0xAA || ScancodeShift == 0xB6){
+                is_Shift = false;
+                return 0;
+            }
+
+            if(ScancodeShift < 0x80){
+                char c = 0;
+                if(is_Shift){
+                    c = Scanner_Shift[ScancodeShift];
+                } else {
+                    c = Scanner[ScancodeShift];
+                }
+                return c;
+            }
+
+            return 0;
+        }   
 };
 
 extern "C" void kernel_main() {
@@ -153,9 +180,9 @@ extern "C" void kernel_main() {
     
     boot.CPUBootChecker();
     boot.GPUBootChecker();
-	if((boot.CPUBootChecker() || boot.GPUBootChecker()) == false){
-		return;
-	}
+    if((boot.CPUBootChecker() || boot.GPUBootChecker()) == false){
+        return;
+    }
 
     print.Color(0x0A);
     print << "Hello World!!!!!! \n";
@@ -182,9 +209,9 @@ extern "C" void kernel_main() {
     print.RestoreColor();
     
     while(1){
-        char text = Screen::Keyboard_Driver();
+        char text = Screen::Keyboard_Driver_Shift();
         if(text != 0){
-            char str[] = {text, '\0'};
+            char str[2] = {text, '\0'};
             print << str;
         }
     }
