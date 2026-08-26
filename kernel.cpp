@@ -212,7 +212,7 @@ extern "C" void kernel_main() {
         char text = Screen::Keyboard_Driver_Shift();
         if(text != 0){
             char str[2] = {text, '\0'};
-            print << str;
+            print << "myOS@MyOS-MyOSV0.1 ~ %" << str;
         }
     }
 }
