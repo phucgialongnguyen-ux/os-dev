@@ -212,6 +212,8 @@ extern "C" void kernel_main() {
         constexpr unsigned char cmd[] = {"clear"};
         char cmd_index = 0;
         if(text != 0){
+            char str[2] = {text, '\0'};
+            print << str;
             if(text == cmd[cmd_index]){
                 cmd_index++;
                 if(cmd[cmd_index] != '\0'){
@@ -227,8 +229,6 @@ extern "C" void kernel_main() {
                     }
                 }
             }            
-            char str[2] = {text, '\0'};
-            print << str;
             }      
         }
 }
