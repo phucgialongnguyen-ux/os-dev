@@ -118,7 +118,6 @@ class Screen{
                     vga_display[curr_pos + 1] = 0x07;
                     continue;
                 }
-
                 vga_display[curr_pos] = text[i];
                 vga_display[curr_pos + 1] = curr_color;
                 curr_pos += 2;
@@ -212,6 +211,16 @@ extern "C" void kernel_main() {
         char text = Screen::Keyboard_Driver_Shift();
         if(text != 0){
             char str[2] = {text, '\0'};
+            unsigned char cmd[] = {"clear"};
+            for(int i = 0; ;i++){
+            if(str[0] == 'c' && str[1] == 'l' && str[2] == 'e' && str[3] == 'a' && str[4] == 'n'){
+                print.CleanUp();
+            }
+            else{
+                print << "Command not found \n";
+                break;
+            }
+        }
             print << str;
         }
     }
