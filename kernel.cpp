@@ -210,6 +210,9 @@ extern "C" void kernel_main() {
     while(1){
         char text = Screen::Keyboard_Driver_Shift();
         if(text != 0){
+            if(text == '!c'){
+                print.CleanUp();            
+            }
             char str[2] = {text, '\0'};
             print << str;
         }
