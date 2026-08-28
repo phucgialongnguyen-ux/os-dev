@@ -218,15 +218,15 @@ extern "C" void kernel_main() {
                     print.CleanUp();
                     cmd_index = 0;
                 }
-            }
             else{
                 if(text == cmd[0]){
                     cmd_index = 1;
                 }
                 else{
                     cmd_index = 0;
+                    }
                 }
-            }
+            }            
             char str[2] = {text, '\0'};
             print << str;
             }      
