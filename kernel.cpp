@@ -209,12 +209,18 @@ extern "C" void kernel_main() {
     
     while(1){
         char text = Screen::Keyboard_Driver_Shift();
+        constexpr unsigned char cmd[] = {"clear"};
+        char cmd_index = 0;
         if(text != 0){
-            if(text == '!c'){
-                print.CleanUp();            
+            if(text == cmd[cmd_index]){
+                cmd_index++;
+                if(cmd[cmd_index] != '\0'){
+                    print.CleanUp();
+                    cmd_index = 0;
+                }
             }
             char str[2] = {text, '\0'};
             print << str;
+            }      
         }
-    }
 }
