@@ -105,7 +105,6 @@ class Screen{
             0, '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', 0,
             '*', 0, ' '
         };
-
         Screen& operator<<(const char* text){
             for(int i = 0 ; text[i] != '\0'; i++ ){
                 if(text[i] == '\n' ){
@@ -168,9 +167,8 @@ class Screen{
                 }
                 return c;
             }
-
             return 0;
-        }   
+        }
 };
 
 extern "C" void kernel_main() {
@@ -179,7 +177,7 @@ extern "C" void kernel_main() {
     
     boot.CPUBootChecker();
     boot.GPUBootChecker();
-    if((boot.CPUBootChecker() || boot.GPUBootChecker()) == false){
+    if((!boot.CPUBootChecker() || !boot.GPUBootChecker())){
         return;
     }
 
@@ -214,21 +212,6 @@ extern "C" void kernel_main() {
         if(text != 0){
             char str[2] = {text, '\0'};
             print << str;
-            if(text == cmd[cmd_index]){
-                cmd_index++;
-                if(cmd[cmd_index] != '\0'){
-                    print.CleanUp();
-                    cmd_index = 0;
-                }
-            else{
-                if(text == cmd[0]){
-                    cmd_index = 1;
-                }
-                else{
-                    cmd_index = 0;
-                    }
-                }
-            }            
-            }      
+            }               
         }
 }
