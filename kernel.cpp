@@ -7,7 +7,7 @@ __attribute__((section(".multiboot"))) const unsigned int boot_checksum[]{
 class Screen{
     private:
         volatile char* vga_display  = (volatile char*)0xB8000; 
-        int curr_pos = 0;
+        static inline int curr_pos = 0;
         char curr_color = 0x07;
         volatile char* vga_graphic = (volatile char*)0xA0000;
 
@@ -53,7 +53,7 @@ class Screen{
             curr_color = color;
         }
 
-        bool CPUBootChecker(){
+        inline bool CPUBootChecker(){
             for(int i = 0; i < 10; i++){
                 if (1 + 1 != 2) return false;                    
                 if (10121 * 12 != 121452) return false;               
@@ -69,7 +69,7 @@ class Screen{
             return true;
         }
 
-        bool GPUBootChecker(){
+        inline bool GPUBootChecker(){
             for(int i = 0; i < 30000; i += 2){
                 vga_graphic[i] = 0x00;
                 vga_graphic[i + 1] = 0x07;
@@ -105,7 +105,7 @@ class Screen{
             0, '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', 0,
             '*', 0, ' '
         };
-        Screen& operator<<(const char* text){
+        inline Screen& operator<<(const char* text){
             for(int i = 0 ; text[i] != '\0'; i++ ){
                 if(text[i] == '\n' ){
                     curr_pos = (curr_pos / 160 + 1) * 160;
@@ -124,11 +124,11 @@ class Screen{
             return *this;
         }
 
-        void RestoreColor(){
+        inline void RestoreColor(){
             curr_color = 0x07;
         }
 
-        void CleanUp(int Cleaner_limit = 4000){
+        inline void CleanUp(int Cleaner_limit = 4000){
             if(Cleaner_limit > 4000){
                 *this << "Chuong Trinh Beo Qua!";
                 return;
@@ -169,6 +169,28 @@ class Screen{
             }
             return 0;
         }
+        static unsigned char Keyboard_Driver_Arrow(){
+            if((input(0x64) & 1) == 0){
+                return 0;
+            }
+            char ScancodeArrow = input(0x60);
+            if(ScancodeArrow == 0x48){
+               if(curr_pos >= 160) curr_pos -= 160;
+                return 0x11;
+            }
+            if(ScancodeArrow == 0x50){
+                if(curr_pos < 4000) curr_pos += 160;
+                return 0x12;
+            }
+            if(ScancodeArrow == 0x4B){
+                if(curr_pos >= 2) curr_pos -=2;
+                return 0x13;
+            }
+            if(ScancodeArrow == 0x4D){
+                if(curr_pos + 2 < 4000) curr_pos += 2;
+                return 0x14;
+            }
+        }
 };
 
 extern "C" void kernel_main() {
@@ -207,8 +229,6 @@ extern "C" void kernel_main() {
     
     while(1){
         char text = Screen::Keyboard_Driver_Shift();
-        constexpr unsigned char cmd[] = {"clear"};
-        char cmd_index = 0;
         if(text != 0){
             char str[2] = {text, '\0'};
             print << str;
