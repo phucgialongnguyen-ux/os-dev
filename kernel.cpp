@@ -167,8 +167,6 @@ class Screen{
                 }
                 return c;
             }
-            return 0;
-        
             static bool is_extended = false;
             if(Scancode == 0xE0){
                 is_extended = true;
