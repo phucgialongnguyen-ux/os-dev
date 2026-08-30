@@ -169,6 +169,28 @@ class Screen{
             }
             return 0;
         }
+        static unsigned char Keyboard_Driver_Arrow(){
+            if((input(0x64) & 1) == 0){
+                return 0;
+            }
+            char ScancodeArrow = input(0x60);
+            if(ScancodeArrow == 0x48){
+               if(curr_pos >= 160) curr_pos -= 160;
+                return 0x11;
+            }
+            if(ScancodeArrow == 0x50){
+                if(curr_pos < 4000) curr_pos += 160;
+                return 0x12;
+            }
+            if(ScancodeArrow == 0x4B){
+                if(curr_pos >= 2) curr_pos -=2;
+                return 0x13;
+            }
+            if(ScancodeArrow == 0x4D){
+                if(curr_pos + 2 < 4000) curr_pos += 2;
+                return 0x14;
+            }
+        }
 };
 
 extern "C" void kernel_main() {
@@ -176,8 +198,8 @@ extern "C" void kernel_main() {
     Screen boot;
     
     boot.CPUBootChecker();
-    //boot.GPUBootChecker();
-    if(!boot.CPUBootChecker()){
+    boot.GPUBootChecker();
+    if((!boot.CPUBootChecker() || !boot.GPUBootChecker())){
         return;
     }
 
