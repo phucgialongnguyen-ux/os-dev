@@ -140,42 +140,36 @@ class Screen{
             curr_pos = 0;
         }
 
-        inline static unsigned char Keyboard_Driver_Shift(){
+        inline static unsigned char Keyboard_Driver(){
             if((input(0x64) & 1) == 0){
                 return 0;
             }
 
             static bool is_Shift = false;
-            unsigned char ScancodeShift = input(0x60);
+            unsigned char Scancode = input(0x60);
 
-            if(ScancodeShift == 0x2A || ScancodeShift == 0x36){
+            if(Scancode == 0x2A || Scancode == 0x36){
                 is_Shift = true;
                 return 0;
             }
 
-            if(ScancodeShift == 0xAA || ScancodeShift == 0xB6){
+            if(Scancode == 0xAA || Scancode == 0xB6){
                 is_Shift = false;
                 return 0;
             }
 
-            if(ScancodeShift < 0x80){
+            if(Scancode < 0x80){
                 char c = 0;
                 if(is_Shift){
-                    c = Scanner_Shift[ScancodeShift];
+                    c = Scanner_Shift[Scancode];
                 } else {
-                    c = Scanner[ScancodeShift];
+                    c = Scanner[Scancode];
                 }
                 return c;
             }
             return 0;
-        }
-        inline static unsigned char Keyboard_Driver_Extended(){
-            if((input(0x64) & 1) == 0){
-                return 0;
-            }
-            unsigned char Scancode = input(0x60);
+        
             static bool is_extended = false;
-            static bool is_Shift = false;
             if(Scancode == 0xE0){
                 is_extended = true;
                 return 0;
@@ -202,7 +196,7 @@ class Screen{
                 return 0;
             }
             return 0;
-        }
+    }
 };
 
 extern "C" void kernel_main() {
@@ -237,8 +231,7 @@ extern "C" void kernel_main() {
     print.RestoreColor();
     
     while(1){
-        char text = Screen::Keyboard_Driver_Shift();
-        print.Keyboard_Driver_Extended();
+        char text = Screen::Keyboard_Driver();
         if(text != 0){
             char str[2] = {text, '\0'};
             print << str;
