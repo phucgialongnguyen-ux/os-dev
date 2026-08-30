@@ -192,7 +192,8 @@ class Screen{
                 }
                 return c;
             }
-    }
+            return 0;
+        }
 };
 
 extern "C" void kernel_main() {
