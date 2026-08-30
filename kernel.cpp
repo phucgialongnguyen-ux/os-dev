@@ -210,7 +210,7 @@ extern "C" void kernel_main() {
     Screen boot;
     
     boot.CPUBootChecker();
-    boot.GPUBootChecker();
+    //boot.GPUBootChecker();
 
     print.Color(0x0A);
     print << "Hello World!!!!!! \n";
