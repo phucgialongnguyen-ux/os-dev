@@ -231,12 +231,8 @@ extern "C" void kernel_main() {
     while(1){
         char text = Screen::Keyboard_Driver();
         if(text != 0){
-            if(text >= 0x11 && text <= 0x14){
-
-            } else {
             char str[2] = {text, '\0'};
-            print << str;
-            }               
+            print << str;               
         }
     }
 }
