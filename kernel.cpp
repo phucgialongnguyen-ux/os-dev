@@ -227,11 +227,11 @@ extern "C" void kernel_main() {
     print << "Write something! \n";
     print.RestoreColor();
     
-//    while(1){
-//        char text = Screen::Keyboard_Driver();
-//        if(text != 0){
-//            char str[2] = {text, '\0'};
-//            print << str;               
-//       }
-//    }
+    while(1){
+        char text = Screen::Keyboard_Driver();
+        if(text != 0){
+            char str[2] = {text, '\0'};
+            print << str;               
+       }
+    }
 }
