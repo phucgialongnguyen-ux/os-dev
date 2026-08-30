@@ -157,21 +157,12 @@ class Screen{
                 is_Shift = false;
                 return 0;
             }
-
-            if(Scancode < 0x80){
-                char c = 0;
-                if(is_Shift){
-                    c = Scanner_Shift[Scancode];
-                } else {
-                    c = Scanner[Scancode];
-                }
-                return c;
-            }
             static bool is_extended = false;
             if(Scancode == 0xE0){
                 is_extended = true;
                 return 0;
             }
+            static bool is_extended = false;
             if(is_extended){
                 is_extended = false;
                 if(Scancode == 0x2A || Scancode == 0x36){
@@ -194,6 +185,15 @@ class Screen{
                 return 0;
             }
             return 0;
+            if(Scancode < 0x80){
+                char c = 0;
+                if(is_Shift){
+                    c = Scanner_Shift[Scancode];
+                } else {
+                    c = Scanner[Scancode];
+                }
+                return c;
+            }
     }
 };
 
