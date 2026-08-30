@@ -174,21 +174,42 @@ class Screen{
                 return 0;
             }
             char ScancodeArrow = input(0x60);
+            bool is_arrow = true;
             if(ScancodeArrow == 0x48){
                if(curr_pos >= 160) curr_pos -= 160;
+               is_arrow = true;
                 return 0x11;
+            }
+            if(ScancodeArrow == 0xC8){
+                is_arrow = false;
+                return 0;
             }
             if(ScancodeArrow == 0x50){
                 if(curr_pos < 4000) curr_pos += 160;
+                is_arrow = true;
                 return 0x12;
+            }
+            if(ScancodeArrow == 0xD0){
+                is_arrow = false;
+                return 0;
             }
             if(ScancodeArrow == 0x4B){
                 if(curr_pos >= 2) curr_pos -=2;
+                is_arrow = true;
                 return 0x13;
+            }
+            if(ScancodeArrow == 0xCB){
+                is_arrow = false;
+                return 0;
             }
             if(ScancodeArrow == 0x4D){
                 if(curr_pos + 2 < 4000) curr_pos += 2;
+                is_arrow = true;
                 return 0x14;
+            }
+            if(ScancodeArrow == 0xCD){
+                is_arrow = false;
+                return 0;
             }
         }
 };
