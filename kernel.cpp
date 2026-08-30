@@ -173,17 +173,16 @@ class Screen{
                     is_Shift = false;
                     return 0;
                 }
-                if(Scancode == 0x48){ if(curr_pos >= 160) curr_pos -= 160; return 0x11;}
-                if(Scancode == 0x50){ if(curr_pos = 160 < 4000) curr_pos += 160; return 0x12;}
-                if(Scancode == 0x4B){ if(curr_pos >= 2) curr_pos -=2; return 0x13;} 
-                if(Scancode == 0x4D){ if(curr_pos + 2 < 4000) curr_pos += 2; return 0x14;} 
+                if(Scancode == 0x48){ if(curr_pos >= 160) curr_pos -= 160; return 0;}
+                if(Scancode == 0x50){ if(curr_pos + 160 < 4000) curr_pos += 160; return 0;}
+                if(Scancode == 0x4B){ if(curr_pos >= 2) curr_pos -=2; return 0;} 
+                if(Scancode == 0x4D){ if(curr_pos + 2 < 4000) curr_pos += 2; return 0;} 
 
                 else if (Scancode == 0xC8 || Scancode == 0xD0 || Scancode == 0xCB || Scancode == 0xCD) {
                     return 0; 
                 }
                 return 0;
             }
-            return 0;
             if(Scancode < 0x80){
                 char c = 0;
                 if(is_Shift){
