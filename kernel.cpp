@@ -169,27 +169,39 @@ class Screen{
             }
             return 0;
         }
-        static unsigned char Keyboard_Driver_Arrow(){
+        static unsigned char Keyboard_Driver_Extended(){
             if((input(0x64) & 1) == 0){
                 return 0;
             }
-            char ScancodeArrow = input(0x60);
-            if(ScancodeArrow == 0x48){
-               if(curr_pos >= 160) curr_pos -= 160;
-                return 0x11;
+            unsigned char Scancode = input(0x60);
+            static bool is_extended = false;
+            static bool is_Shift = false;
+            if(Scancode == 0xE0){
+                is_extended = true;
+                return 0;
             }
-            if(ScancodeArrow == 0x50){
-                if(curr_pos < 4000) curr_pos += 160;
-                return 0x12;
+            if(is_extended){
+                is_extended = false;
+                if(Scancode == 0x2A || Scancode == 0x36){
+                    is_Shift = true;
+                    return 0;
+                }   
+
+                if(Scancode == 0xAA || Scancode == 0xB6){
+                    is_Shift = false;
+                    return 0;
+                }
+                if(Scancode == 0x48)return 0x11;
+                if(Scancode == 0x50)return 0x12;
+                if(Scancode == 0x4B)return 0x13;
+                if(Scancode == 0x4D)return 0x14; 
+
+                else if (Scancode == 0xC8 || Scancode == 0xD0 || Scancode == 0xCB || Scancode == 0xCD) {
+                    return 0; 
+                }
+                return 0;
             }
-            if(ScancodeArrow == 0x4B){
-                if(curr_pos >= 2) curr_pos -=2;
-                return 0x13;
-            }
-            if(ScancodeArrow == 0x4D){
-                if(curr_pos + 2 < 4000) curr_pos += 2;
-                return 0x14;
-            }
+            return 0;
         }
 };
 
@@ -226,6 +238,7 @@ extern "C" void kernel_main() {
     
     while(1){
         char text = Screen::Keyboard_Driver_Shift();
+        print.Keyboard_Driver_Extended();
         if(text != 0){
             char str[2] = {text, '\0'};
             print << str;
