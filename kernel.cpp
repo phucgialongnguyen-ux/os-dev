@@ -169,46 +169,6 @@ class Screen{
             }
             return 0;
         }
-        static unsigned char Keyboard_Driver_Extended(){
-            if((input(0x64) & 1) == 0){
-                return 0;
-            }
-            static bool is_extended = false;
-            char Scanercode = input(0x60);
-            if(Scanercode== 0xE0){
-                is_extended = true;
-                return 0;
-            }
-            if(Scanercode != 0xE0){
-                is_extended = false;
-                return 0;
-            }
-            if(is_extended){
-                is_extended = false;
-                if (Scanercode == 0x48) { if (curr_pos >= 160) curr_pos -= 160; return 0x11; }
-                if (Scanercode == 0x50) { if (curr_pos + 160 < 4000) curr_pos += 160; return 0x12; }
-                if (Scanercode == 0x4B) { if (curr_pos >= 2) curr_pos -= 2; return 0x13; }
-                if (Scanercode == 0x4D) { if (curr_pos + 2 <  4000) curr_pos += 2; return 0x14; }
-            }
-            static bool is_Shift = false;
-            if(Scanercode == 0x2A || Scanercode == 0x36){
-                is_Shift = true;
-                return 0;
-            }
-
-            if(Scanercode == 0xAA || Scanercode == 0xB6){
-                is_Shift = false;
-                return 0;
-            }
-            if(Scanercode == 0x80){
-                if(is_Shift) {
-                    return Scanner_Shift[Scanercode];
-                } 
-                else{
-                    return Scanner[Scanercode];
-                }
-            }
-        }
 };
 
 extern "C" void kernel_main() {
@@ -246,7 +206,7 @@ extern "C" void kernel_main() {
     print.RestoreColor();
     
     while(1){
-        char text = Screen::Keyboard_Driver_Extended();
+        char text = Screen::Keyboard_Driver_Shift();
         if(text != 0){
             char str[2] = {text, '\0'};
             print << str;
