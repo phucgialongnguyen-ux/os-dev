@@ -162,7 +162,6 @@ class Screen{
                 is_extended = true;
                 return 0;
             }
-            static bool is_extended = false;
             if(is_extended){
                 is_extended = false;
                 if(Scancode == 0x2A || Scancode == 0x36){
@@ -175,7 +174,7 @@ class Screen{
                     return 0;
                 }
                 if(Scancode == 0x48){ if(curr_pos >= 160) curr_pos -= 160; return 0x11;}
-                if(Scancode == 0x50){ if(curr_pos < 4000) curr_pos += 160; return 0x12;}
+                if(Scancode == 0x50){ if(curr_pos = 160 < 4000) curr_pos += 160; return 0x12;}
                 if(Scancode == 0x4B){ if(curr_pos >= 2) curr_pos -=2; return 0x13;} 
                 if(Scancode == 0x4D){ if(curr_pos + 2 < 4000) curr_pos += 2; return 0x14;} 
 
