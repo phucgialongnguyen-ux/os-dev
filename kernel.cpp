@@ -216,8 +216,8 @@ extern "C" void kernel_main() {
     Screen boot;
     
     boot.CPUBootChecker();
-    boot.GPUBootChecker();
-    if((!boot.CPUBootChecker() || !boot.GPUBootChecker())){
+    //boot.GPUBootChecker();
+    if(!boot.CPUBootChecker()){
         return;
     }
 
