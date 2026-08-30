@@ -140,7 +140,7 @@ class Screen{
             curr_pos = 0;
         }
 
-        static unsigned char Keyboard_Driver_Shift(){
+        inline static unsigned char Keyboard_Driver_Shift(){
             if((input(0x64) & 1) == 0){
                 return 0;
             }
@@ -169,7 +169,7 @@ class Screen{
             }
             return 0;
         }
-        static unsigned char Keyboard_Driver_Extended(){
+        inline static unsigned char Keyboard_Driver_Extended(){
             if((input(0x64) & 1) == 0){
                 return 0;
             }
