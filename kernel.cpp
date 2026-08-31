@@ -216,7 +216,7 @@ extern "C" void kernel_main() {
 
     boot.CPUBootChecker();
 
-    Screen::SysSpeaker(1193180);
+    Screen::SysSpeaker(1000);
     for(volatile int i = 0; i < 200000; i++){}
     Screen::SysSpeakerStop();
 
