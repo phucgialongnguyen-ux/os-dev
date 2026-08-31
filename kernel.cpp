@@ -140,6 +140,14 @@ class Screen{
             curr_pos = 0;
         }
 
+        static inline void update_cursor(int pos) {
+            unsigned short index = pos / 2;
+            output(0x3D4, 0x0F);
+            output(0x3D5, (unsigned char)(index & 0xFF));
+            output(0x3D4, 0x0E);
+            output(0x3D5, (unsigned char)((index >> 8) & 0xFF));
+        }
+
         inline static unsigned char Keyboard_Driver(){
             if((input(0x64) & 1) == 0){
                 return 0;
@@ -173,11 +181,11 @@ class Screen{
                     is_Shift = false;
                     return 0;
                 }
-                if(Scancode == 0x48){ if(curr_pos >= 160) curr_pos -= 160; return 0;}
-                if(Scancode == 0x50){ if(curr_pos + 160 < 4000) curr_pos += 160; return 0;}
-                if(Scancode == 0x4B){ if(curr_pos >= 2) curr_pos -=2; return 0;} 
-                if(Scancode == 0x4D){ if(curr_pos + 2 < 4000) curr_pos += 2; return 0;} 
-
+                if(Scancode == 0x48){ if(curr_pos >= 160) curr_pos -= 160; }  
+                else if(Scancode == 0x50){ if(curr_pos + 160 < 4000) curr_pos += 160; } 
+                else if(Scancode == 0x4B){ if(curr_pos >= 2) curr_pos -= 2; }        
+                else if(Scancode == 0x4D){ if(curr_pos + 2 < 4000) curr_pos += 2; }     
+                UpdateCursor();
                 else if (Scancode == 0xC8 || Scancode == 0xD0 || Scancode == 0xCB || Scancode == 0xCD) {
                     return 0; 
                 }
