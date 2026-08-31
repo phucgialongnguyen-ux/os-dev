@@ -91,7 +91,8 @@ class Screen{
             asm volatile("outb %0, %1" :: "a"(val), "Nd"(port));
         }
         static inline void SysSpeaker(unsigned int freq){
-            unsigned int div = div / freq;
+            unsigned int base_freq = 1193180;
+            unsigned int div = base_freq  / freq;
             output(0x43, 0xB6);
             output(0x42, (unsigned short)(div & 0xFF));
             output(0x42, (unsigned short)(div >> 8 & 0xFF));
@@ -216,7 +217,7 @@ extern "C" void kernel_main() {
     boot.CPUBootChecker();
 
     Screen::SysSpeaker(1193180);
-    for(volatile int i = 0; i < 2000; i++){}
+    for(volatile int i = 0; i < 200000; i++){}
     Screen::SysSpeakerStop();
 
     print.Color(0x0A);
