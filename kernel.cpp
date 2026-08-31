@@ -142,7 +142,7 @@ class Screen{
                     continue;
                 }
                 if(text[i] == '\b'){
-                    if(curr_pos % 160 == 0){
+                    if(curr_pos % 160 != 0){
                         curr_pos -= 2;
                         vga_display[curr_pos] = ' ';
                         vga_display[curr_pos + 1] = 0x07;
