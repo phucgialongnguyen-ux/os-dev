@@ -90,8 +90,19 @@ class Screen{
         static inline void output(unsigned short port, unsigned char val){
             asm volatile("outb %0, %1" :: "a"(val), "Nd"(port));
         }
+        static inline void SysSpeaker(unsigned int freq){
+            unsigned int div = div / freq;
+            output(0x43, 0xB6);
+            output(0x42, (unsigned short)(div & 0xFF));
+            output(0x42, (unsigned short)(div >> 8 & 0xFF));
+            output(0x61, input(0x61) | 3);
+
+        }
+        static inline void SysSpeakerStop(){
+            output(0x61, input(0x61) & 0xFC);
+        }
         static inline void UpdateCursor(){
-            static bool init = false; //i don't understand this shit so yeah i'll copy & paste then
+            static bool init = false; //i don't understand this shit so yeah i'll copy && paste then
             if(!init){
                 output(0x3D4, 0x0A);
                 output(0x3D5, (input(0x3D5) & 0xC0) | 13); 
@@ -204,6 +215,10 @@ extern "C" void kernel_main() {
 
     boot.CPUBootChecker();
 
+    Screen::SysSpeaker(1193180);
+    for(volatile int i = 0; i < 2000; i++){}
+    Screen::SysSpeakerStop();
+
     print.Color(0x0A);
     print << "Hello World!!!!!! \n";
     print.RestoreColor();
@@ -213,7 +228,6 @@ extern "C" void kernel_main() {
     print.RestoreColor();
 
     Screen::UpdateCursor();
-
     while(1){
         char text = Screen::Keyboard_Driver();
         if(text != 0){
