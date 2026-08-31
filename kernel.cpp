@@ -91,6 +91,15 @@ class Screen{
             asm volatile("outb %0, %1" :: "a"(val), "Nd"(port));
         }
 
+        // Đổi tên thành UpdateCursor thống nhất & hỗ trợ gọi static
+        static inline void UpdateCursor(){
+            unsigned short index = curr_pos / 2;
+            output(0x3D4, 0x0F);
+            output(0x3D5, (unsigned char)(index & 0xFF));
+            output(0x3D4, 0x0E);
+            output(0x3D5, (unsigned char)((index >> 8) & 0xFF));
+        }
+
         static constexpr unsigned char Scanner[128] = {
             0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
             '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
@@ -105,6 +114,7 @@ class Screen{
             0, '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', 0,
             '*', 0, ' '
         };
+
         inline Screen& operator<<(const char* text){
             for(int i = 0 ; text[i] != '\0'; i++ ){
                 if(text[i] == '\n' ){
@@ -121,6 +131,7 @@ class Screen{
                 vga_display[curr_pos + 1] = curr_color;
                 curr_pos += 2;
             }
+            UpdateCursor();
             return *this;
         }
 
@@ -138,14 +149,7 @@ class Screen{
                 vga_display[Cleaner + 1] = 0x07;
             }
             curr_pos = 0;
-        }
-
-        static inline void update_cursor(int pos) {
-            unsigned short index = pos / 2;
-            output(0x3D4, 0x0F);
-            output(0x3D5, (unsigned char)(index & 0xFF));
-            output(0x3D4, 0x0E);
-            output(0x3D5, (unsigned char)((index >> 8) & 0xFF));
+            UpdateCursor();
         }
 
         inline static unsigned char Keyboard_Driver(){
@@ -154,50 +158,32 @@ class Screen{
             }
 
             static bool is_Shift = false;
+            static bool is_extended = false;
             unsigned char Scancode = input(0x60);
 
-            if(Scancode == 0x2A || Scancode == 0x36){
-                is_Shift = true;
-                return 0;
-            }
-
-            if(Scancode == 0xAA || Scancode == 0xB6){
-                is_Shift = false;
-                return 0;
-            }
-            static bool is_extended = false;
             if(Scancode == 0xE0){
                 is_extended = true;
                 return 0;
             }
+
             if(is_extended){
                 is_extended = false;
-                if(Scancode == 0x2A || Scancode == 0x36){
-                    is_Shift = true;
-                    return 0;
-                }   
+                
+                // Cập nhật vị trí con trỏ dựa trên phím mũi tên
+                if(Scancode == 0x48){ if(curr_pos >= 160) curr_pos -= 160; }        // LÊN
+                else if(Scancode == 0x50){ if(curr_pos + 160 < 4000) curr_pos += 160; } // XUỐNG
+                else if(Scancode == 0x4B){ if(curr_pos >= 2) curr_pos -= 2; }         // TRÁI
+                else if(Scancode == 0x4D){ if(curr_pos + 2 < 4000) curr_pos += 2; }     // PHẢI
 
-                if(Scancode == 0xAA || Scancode == 0xB6){
-                    is_Shift = false;
-                    return 0;
-                }
-                if(Scancode == 0x48){ if(curr_pos >= 160) curr_pos -= 160; }  
-                else if(Scancode == 0x50){ if(curr_pos + 160 < 4000) curr_pos += 160; } 
-                else if(Scancode == 0x4B){ if(curr_pos >= 2) curr_pos -= 2; }        
-                else if(Scancode == 0x4D){ if(curr_pos + 2 < 4000) curr_pos += 2; }     
-                UpdateCursor();
-                else if (Scancode == 0xC8 || Scancode == 0xD0 || Scancode == 0xCB || Scancode == 0xCD) {
-                    return 0; 
-                }
+                UpdateCursor(); 
                 return 0;
             }
+
+            if(Scancode == 0x2A || Scancode == 0x36){ is_Shift = true; return 0; }
+            if(Scancode == 0xAA || Scancode == 0xB6){ is_Shift = false; return 0; }
+
             if(Scancode < 0x80){
-                char c = 0;
-                if(is_Shift){
-                    c = Scanner_Shift[Scancode];
-                } else {
-                    c = Scanner[Scancode];
-                }
+                char c = is_Shift ? Scanner_Shift[Scancode] : Scanner[Scancode];
                 return c;
             }
             return 0;
@@ -207,39 +193,24 @@ class Screen{
 extern "C" void kernel_main() {
     Screen print;
     Screen boot;
-    
+
     boot.CPUBootChecker();
-    //boot.GPUBootChecker();
 
     print.Color(0x0A);
     print << "Hello World!!!!!! \n";
     print.RestoreColor();
 
-    //print.Color(0x0C);
-    //print << " [ WARNING : MYOS UNRESTRICTED CORE ACCESS ] \n";
-    //print << "Hey! WELCOME TO MYOS.\n";
-    //print << "Just a heads up before you jump in: This OS gives you 100% control over your\n";
-    //print << "hardwares. No restrictions, no protective limits, no hand-holding.\n";
-    //print << "\n";
-    //print << "You can push the CPU, tweak the GPU, or mess with RAM directly if you want!\n";
-    //print << "However, if you end up frying your chip or blowing up a component, that's\n";
-    //print << "completely on you!! I am not responsible for any broken hardware or lost\n";
-    //print << "data.\n";
-    //print.RestoreColor();
-
-    //print.Color(0x0E);
-    //print << "Remember you own the machine, you own everything!!!!\n";
-    //print.RestoreColor();
-
     print.Color(0x0A);
     print << "Write something! \n";
     print.RestoreColor();
-    
+
+    Screen::UpdateCursor();
+
     while(1){
         char text = Screen::Keyboard_Driver();
         if(text != 0){
             char str[2] = {text, '\0'};
             print << str;               
-       }
+        }
     }
 }
