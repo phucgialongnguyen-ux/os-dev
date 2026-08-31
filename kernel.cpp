@@ -90,14 +90,22 @@ class Screen{
         static inline void output(unsigned short port, unsigned char val){
             asm volatile("outb %0, %1" :: "a"(val), "Nd"(port));
         }
-
-        // Đổi tên thành UpdateCursor thống nhất & hỗ trợ gọi static
         static inline void UpdateCursor(){
+            static bool init = false; //i don't understand this shit so yeah i'll copy & paste then
+            if(!init){
+                output(0x3D4, 0x0A);
+                output(0x3D5, (input(0x3D5) & 0xC0) | 13); 
+                output(0x3D4, 0x0B);
+                output(0x3D5, (input(0x3D5) & 0xE0) | 15); 
+                init = true;
+            }
+
             unsigned short index = curr_pos / 2;
             output(0x3D4, 0x0F);
             output(0x3D5, (unsigned char)(index & 0xFF));
             output(0x3D4, 0x0E);
             output(0x3D5, (unsigned char)((index >> 8) & 0xFF));
+
         }
 
         static constexpr unsigned char Scanner[128] = {
@@ -169,7 +177,7 @@ class Screen{
             if(is_extended){
                 is_extended = false;
                 
-                // Cập nhật vị trí con trỏ dựa trên phím mũi tên
+                // this too
                 if(Scancode == 0x48){ if(curr_pos >= 160) curr_pos -= 160; }        // LÊN
                 else if(Scancode == 0x50){ if(curr_pos + 160 < 4000) curr_pos += 160; } // XUỐNG
                 else if(Scancode == 0x4B){ if(curr_pos >= 2) curr_pos -= 2; }         // TRÁI
