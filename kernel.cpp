@@ -97,7 +97,7 @@ class Screen{
             return ret;
         }
         static inline void output16bit(unsigned short port, unsigned int val){
-            asm volatile("outb %0, %1" :: "a"(val), "Nd"(port));
+            asm volatile("outw %0, %1" :: "a"(val), "Nd"(port));
         }
 
         static inline void SysSpeaker(unsigned int freq){
