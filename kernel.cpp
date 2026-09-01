@@ -346,6 +346,8 @@ extern "C" void kernel_main() {
         print << "Boot flag: " << (unsigned int)entry1->boot_indicator << "\n";
         print << "System ID: " << (unsigned int)entry1->partition_type << "\n";
         print << "Sector count: " << entry1->sector_count << "\n";
+        print << "Magic Byte 1: " << (unsigned int)buffer[510] << "\n";
+        print << "Magic Byte 2: " << (unsigned int)buffer[511] << "\n";
         print.RestoreColor();
         return;
     }
