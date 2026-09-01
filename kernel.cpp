@@ -256,14 +256,34 @@ class Screen{
         }
 };
 
+struct __attribute__((packed)) MBRPartitionEntry {
+    unsigned char  boot_indicator; // I'll copy and paste this bullshit too anyway
+    unsigned char  start_chs[3];  
+    unsigned char  partition_type; 
+    unsigned char  end_chs[3];     
+    unsigned int   start_lba;     
+    unsigned int   sector_count;   
+};
+
 extern "C" void kernel_main() {
     Screen print;
     Screen boot;
 
     boot.CPUBootChecker();
 
-    Screen::SysSpeaker(1000);
-    for(volatile int i = 0; i < 200000; i++){}
+    unsigned char buffer[512];
+    Screen::LBA28mod(0, buffer);
+    MBRPartitionEntry* entry1 = (MBRPartitionEntry*)&buffer[0x1BE];
+    if (entry1->partition_type != 0) {
+        print << "Partition 1 Found!\n";
+        print << "Bootable: ";
+        if (entry1->boot_indicator == 0x80) print << "Yes\n"; else print << "No\n";
+    } else {
+        print << "No Partition Found on Entry 1!\n";
+    }
+
+    Screen::SysSpeaker(1000); // i tried this on virtualbox but i don't heard anything 
+    for(volatile int i = 0; i < 200000; i++){} 
     Screen::SysSpeakerStop();
 
     print.Color(0x0A);
