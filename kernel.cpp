@@ -277,14 +277,8 @@ class Screen{
             return 0;
         }
         static inline void Primary_ATA_Controller(){
-            static bool is_free = false;
-            static bool is_ready = true;
-            if(((input(0x1F7) >> 7) & 1) == 1){
-                is_free = true;
-            }
-            if(((input(0x1F7) >> 6 ) & 1) == 0){
-                is_ready = true;
-            }
+            while(((input(0x1F7) >> 7) & 1) == 1){}
+            while(((input(0x1F7) >> 6 ) & 1) == 0){}
             output(0x1F6, 0xE0);
 
             output(0x1F2, 1);
@@ -298,6 +292,8 @@ class Screen{
             while(((input(0x1F7) >> 3) & 1) == 0){}
         }
         static inline void LBA28mod(unsigned int lba, unsigned char* buffer){
+            while(((input(0x1F7) >> 7) & 1) == 1){}
+            while(((input(0x1F7) >> 3) & 1) == 0){}
             output(0x1F6, 0xE0 | ((lba >> 24) & 0x0F));
             output(0x1F2, 1);
             output(0x1F3, (lba & 0xFF));
