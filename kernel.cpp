@@ -335,8 +335,8 @@ extern "C" void kernel_main() {
         print << "Bootable: ";
         unsigned int all_sector = entry1->sector_count;
         unsigned int all_storange = all_sector / 2048;
-        unsigned int all_sector = entry1->sector_count;
-        unsigned int all_storange = all_sector / 2048;
+        all_sector = entry1->sector_count;
+        all_storange = all_sector / 2048;
         print << "Storage: " << all_storange << " MB";
 
         if (entry1->boot_indicator == 0x80) print << "Yes\n"; else print << "No\n";
