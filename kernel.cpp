@@ -341,7 +341,12 @@ extern "C" void kernel_main() {
 
         if (entry1->boot_indicator == 0x80) print << "Yes\n"; else print << "No\n";
     } else {
+        print.Color(0x0C);
         print << "No Partition Found on Entry 1!\n";
+        print << "Boot flag: " << (unsigned int)entry1->boot_indicator << "\n";
+        print << "System ID: " << (unsigned int)entry1->partition_type << "\n";
+        print << "Sector count: " << entry1->sector_count << "\n";
+        print.RestoreColor();
         return;
     }
 
