@@ -292,8 +292,8 @@ class Screen{
         while(((input(0x1F7) >> 3) & 1) == 0){} 
 }
        static inline void LBA28mod(unsigned int lba, unsigned char* buffer){
-            while(((input(0x1F7) >> 7) & 1) == 1){} // Bit 7 (BSY) = 0: Chờ hết BẬN
-            while(((input(0x1F7) >> 6) & 1) == 0){} // Bit 6 (DRDY) = 1: Chờ SẮN SÀNG
+            while(((input(0x1F7) >> 7) & 1) == 1){} 
+            while(((input(0x1F7) >> 6) & 1) == 0){}
 
             output(0x1F6, 0xE0 | ((lba >> 24) & 0x0F));
             output(0x1F2, 1);
@@ -336,7 +336,7 @@ extern "C" void kernel_main() {
         unsigned int all_storange = all_sector / 2048;
         all_sector = entry1->sector_count;
         all_storange = all_sector / 2048;
-        print << "Storage: " << all_storange << " MB";
+        print << "Storage: " << all_storange << " MB\n";
 
         if (entry1->boot_indicator == 0x80) print << "Yes\n"; else print << "No\n";
     } else {
