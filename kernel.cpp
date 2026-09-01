@@ -288,24 +288,27 @@ class Screen{
             output(0x1F7, 0x20);
         }
         static inline void Await_ata(){
-            while(((input(0x1F7) >> 7) & 1) == 1){}
-            while(((input(0x1F7) >> 6) & 1) == 0){}
-        }
-        static inline void LBA28mod(unsigned int lba, unsigned char* buffer){
-            while(((input(0x1F7) >> 7) & 1) == 1){}
-            while(((input(0x1F7) >> 3) & 1) == 0){}
+        while(((input(0x1F7) >> 7) & 1) == 1){} 
+        while(((input(0x1F7) >> 3) & 1) == 0){} 
+}
+       static inline void LBA28mod(unsigned int lba, unsigned char* buffer){
+            while(((input(0x1F7) >> 7) & 1) == 1){} // Bit 7 (BSY) = 0: Chờ hết BẬN
+            while(((input(0x1F7) >> 6) & 1) == 0){} // Bit 6 (DRDY) = 1: Chờ SẮN SÀNG
+
             output(0x1F6, 0xE0 | ((lba >> 24) & 0x0F));
             output(0x1F2, 1);
             output(0x1F3, (lba & 0xFF));
             output(0x1F4, (lba >> 8) & 0xFF);
             output(0x1F5, (lba >> 16) & 0xFF);
             output(0x1F7, 0x20);
+
             Await_ata();
+
             unsigned short* ptr = (unsigned short*)buffer;
             for(int i = 0; i < 256; i++){
                 ptr[i] = input16bit(0x1F0);
             }
-        }
+        }   
 };
 
 struct __attribute__((packed)) MBRPartitionEntry {
