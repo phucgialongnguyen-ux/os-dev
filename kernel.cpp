@@ -92,11 +92,11 @@ class Screen{
         }
 
         static inline unsigned short input16bit(unsigned short port){
-            unsigned char ret;
+            unsigned short ret;
             asm volatile("inw %1, %0" : "=a"(ret) : "Nd"(port));
             return ret;
         }
-        static inline void output16bit(unsigned short port, unsigned int val){
+        static inline void output16bit(unsigned short port, unsigned short val){
             asm volatile("outw %0, %1" :: "a"(val), "Nd"(port));
         }
 
