@@ -87,9 +87,19 @@ class Screen{
             return ret;
         }
 
-        static inline void output(unsigned short port, unsigned char val){
+        static inline void output(unsigned short port, unsigned short val){
             asm volatile("outb %0, %1" :: "a"(val), "Nd"(port));
         }
+
+        static inline unsigned char input16bit(unsigned short port){
+            unsigned char ret;
+            asm volatile("inw %1, %0" : "=a"(ret) : "Nd"(port));
+            return ret;
+        }
+        static inline void output16bit(unsigned short port, unsigned int val){
+            asm volatile("outb %0, %1" :: "a"(val), "Nd"(port));
+        }
+
         static inline void SysSpeaker(unsigned int freq){
             unsigned int base_freq = 1193180;
             unsigned int div = base_freq  / freq;
@@ -209,6 +219,40 @@ class Screen{
                 return c;
             }
             return 0;
+        }
+        static inline void Primary_ATA_Controller(){
+            static bool is_free = false;
+            static bool is_ready = true;
+            if(((input(0x1F7) >> 7) & 1) == 1){
+                is_free = true;
+            }
+            if(((input(0x1F7) >> 6 ) & 1) == 0){
+                is_ready = true;
+            }
+            output(0x1F6, 0xE0);
+
+            output(0x1F2, 1);
+            output(0x1F3, 0);
+            output(0x1F4, 0);
+            output(0x1F5, 0);
+            output(0x1F7, 0x20);
+        }
+        static inline void Await_ata(){
+            while(((input(0x1F7) >> 7) & 1) == 1){}
+            while(((input(0x1F7) >> 3) & 1) == 0){}
+        }
+        static inline void LBA28mod(unsigned int lba, unsigned char* buffer){
+            output(0x1F6, 0xE0 | ((lba >> 24) & 0x0F));
+            output(0x1F2, 1);
+            output(0x1F3, (lba & 0xFF));
+            output(0x1F4, (lba >> 8) & 0xFF);
+            output(0x1F5, (lba >> 16) & 0xFF);
+            output(0x1F7, 0x20);
+            Await_ata();
+            unsigned short* ptr = (unsigned short*)buffer;
+            for(int i = 0; i < 256; i++){
+                ptr[i] = input16bit(0x1F0);
+            }
         }
 };
 
