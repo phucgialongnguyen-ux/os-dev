@@ -159,6 +159,7 @@ class Screen{
                         continue;
                     }
                 }
+
                 vga_display[curr_pos] = text[i];
                 vga_display[curr_pos + 1] = curr_color;
                 curr_pos += 2;
@@ -166,7 +167,62 @@ class Screen{
             UpdateCursor();
             return *this;
         }
-
+        inline Screen& operator<<(char text){
+            char str[2] = {text, '\0'};
+            *this << str;
+            return *this;
+        }
+        inline Screen& operator<<(unsigned char text){
+            return *this << (unsigned int)text;
+        }
+        inline Screen& operator<<(int text){
+            char buffer[32];
+            int i = 0;
+            if(text == 0){
+                buffer[i++] = '0';
+            } else {
+                int num = text;
+                if(num < 0){
+                    buffer[i++] = '-';
+                    num = -num;
+                }
+                int start = i;
+                while(num > 0){
+                    buffer[i++] = (num % 10) + '0';
+                    num /= 10;
+                }
+                for(int j = start, k = i - 1; j < k; j++, k--){
+                    char temp = buffer[j];
+                    buffer[j] = buffer[k];
+                    buffer[k] = temp;
+                }
+            }
+            buffer[i] = '\0';
+            *this << buffer;
+            return *this;
+        }
+        inline Screen& operator<<(unsigned int text){
+            char buffer[32];
+            int i = 0;
+            if(text == 0){
+                buffer[i++] = '0';
+            } else {
+                unsigned int num = text;
+                int start = i;
+                while(num > 0){
+                    buffer[i++] = (num % 10) + '0';
+                    num /= 10;
+                }
+                for(int j = start, k = i - 1; j < k; j++, k--){
+                    char temp = buffer[j];
+                    buffer[j] = buffer[k];
+                    buffer[k] = temp;
+                }
+            }
+            buffer[i] = '\0';
+            *this << buffer;
+            return *this;
+        }
         inline void RestoreColor(){
             curr_color = 0x07;
         }
@@ -277,13 +333,20 @@ extern "C" void kernel_main() {
     if (entry1->partition_type != 0) {
         print << "Partition 1 Found!\n";
         print << "Bootable: ";
+        unsigned int all_sector = entry1->sector_count;
+        unsigned int all_storange = all_sector / 2048;
+        unsigned int all_sector = entry1->sector_count;
+        unsigned int all_storange = all_sector / 2048;
+        print << "Storage: " << all_storange << " MB";
+
         if (entry1->boot_indicator == 0x80) print << "Yes\n"; else print << "No\n";
     } else {
         print << "No Partition Found on Entry 1!\n";
+        return;
     }
 
     Screen::SysSpeaker(1000); // i tried this on virtualbox but i don't heard anything 
-    for(volatile int i = 0; i < 200000; i++){} 
+    for(volatile int i = 0; i < 20000000; i++){} 
     Screen::SysSpeakerStop();
 
     print.Color(0x0A);
