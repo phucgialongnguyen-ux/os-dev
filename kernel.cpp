@@ -289,7 +289,7 @@ class Screen{
         }
         static inline void Await_ata(){
             while(((input(0x1F7) >> 7) & 1) == 1){}
-            while(((input(0x1F7) >> 3) & 1) == 0 && ((input(0x1F7) >> 7) & 1) == 0){}
+            while(((input(0x1F7) >> 3) & 1) == 0 && ((input(0x1F7) & 1)) == 0){}
         }
         static inline void LBA28mod(unsigned int lba, unsigned char* buffer){
             while(((input(0x1F7) >> 7) & 1) == 1){}
