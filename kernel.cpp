@@ -331,6 +331,8 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     unsigned char buffer[512];
     Screen::LBA28mod(0, buffer);
     MBRPartitionEntry* entry1 = (MBRPartitionEntry*)&buffer[0x1BE];
+    unsigned int all_sector = entry1->sector_count;
+    unsigned int all_storange = all_sector / 2048;
     if (drive_type == 1) {
         ahci_driver.init(pci_bar_addr); 
     } 
@@ -341,10 +343,6 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
         if (entry1->partition_type != 0) {
             print << "Partition 1 Found!\n";
             print << "Bootable: ";
-            unsigned int all_sector = entry1->sector_count;
-            unsigned int all_storange = all_sector / 2048;
-            all_sector = entry1->sector_count;
-            all_storange = all_sector / 2048;
             print << "Storage: " << all_storange << " MB\n";
 
             if (entry1->boot_indicator == 0x80) print << "Yes\n"; else print << "No\n";
@@ -396,8 +394,9 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
             if (is_storage && cmd_buffer[7] == '\0') {
                 print.Color(0x0A);
                 print << "[yoursOS Storage Info]\n";
-                print << " - Primary Drive : Active (AHCI/NVMe/IDE Fallback)\n";
-                print << " - Total Capacity: 1024 MB\n";
+                all_sector = entry1->sector_count;
+                all_storange = all_sector / 2048;
+                print << "Storage: " << all_storange << " MB\n";
                 print.RestoreColor();
             } 
             else if (is_help && cmd_buffer[4] == '\0') {
