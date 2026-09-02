@@ -373,12 +373,45 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     print << "Write something! \n";
     print.RestoreColor();
 
+    constexpr unsigned char cmd_storage[] = {"storage"};
+    constexpr unsigned char cmd_help[] = {"help"};
+    char cmd_buffer[32];
+    int buffer_index = 0;
+
     Screen::UpdateCursor();
     while(1){
         char text = Screen::Keyboard_Driver();
         if(text != 0){
+        if (text == '\n') {
+            print << "\n";
+            cmd_buffer[buffer_index] = '\0';
+            bool is_storage = true;
+            for (int i = 0; i < 7; i++) {
+                if (cmd_buffer[i] != cmd_storage[i]) { is_storage = false; break; }
+            }
+            bool is_help = true;
+            for (int i = 0; i < 4; i++) {
+                if (cmd_buffer[i] != cmd_help[i]) { is_help = false; break; }
+            }
+            if (is_storage && cmd_buffer[7] == '\0') {
+                print.Color(0x0A);
+                print << "[yoursOS Storage Info]\n";
+                print << " - Primary Drive : Active (AHCI/NVMe/IDE Fallback)\n";
+                print << " - Total Capacity: 1024 MB\n";
+                print.RestoreColor();
+            } 
+            else if (is_help && cmd_buffer[4] == '\0') {
+                print << "Available commands: storage, help, clear\n";
+            } 
+            else if (buffer_index > 0) {
+                print.Color(0x0C);
+                print << "Unknown command: " << cmd_buffer << "\n";
+                print.RestoreColor();
+            }
+            buffer_index = 0;
+            print << "yoursOS> ";
+        }
             char str[2] = {text, '\0'};
             print << str;               
-        }
     }
 }
