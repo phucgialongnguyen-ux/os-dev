@@ -1,3 +1,5 @@
+#include "ahci.h"
+#include "nvme.h"
 __attribute__((section(".multiboot"))) const unsigned int boot_checksum[]{
         0x1BADB002,
         0x00,
@@ -308,9 +310,8 @@ class Screen{
             for(int i = 0; i < 256; i++){
                 ptr[i] = input16bit(0x1F0);
             }
-        }   
+        }
 };
-
 struct __attribute__((packed)) MBRPartitionEntry {
     unsigned char  boot_indicator; // I'll copy and paste this bullshit too anyway
     unsigned char  start_chs[3];  
@@ -319,8 +320,9 @@ struct __attribute__((packed)) MBRPartitionEntry {
     unsigned int   start_lba;     
     unsigned int   sector_count;   
 };
-
-extern "C" void kernel_main() {
+AHCIDriver ahci_driver;
+NVMeDriver nvme_driver;
+extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     Screen print;
     Screen boot;
 
@@ -329,26 +331,34 @@ extern "C" void kernel_main() {
     unsigned char buffer[512];
     Screen::LBA28mod(0, buffer);
     MBRPartitionEntry* entry1 = (MBRPartitionEntry*)&buffer[0x1BE];
-    if (entry1->partition_type != 0) {
-        print << "Partition 1 Found!\n";
-        print << "Bootable: ";
-        unsigned int all_sector = entry1->sector_count;
-        unsigned int all_storange = all_sector / 2048;
-        all_sector = entry1->sector_count;
-        all_storange = all_sector / 2048;
-        print << "Storage: " << all_storange << " MB\n";
+    if (drive_type == 1) {
+        ahci_driver.init(pci_bar_addr); 
+    } 
+    else if (drive_type == 2) {
+        nvme_driver.init(pci_bar_addr); 
+    } 
+    else {  
+        if (entry1->partition_type != 0) {
+            print << "Partition 1 Found!\n";
+            print << "Bootable: ";
+            unsigned int all_sector = entry1->sector_count;
+            unsigned int all_storange = all_sector / 2048;
+            all_sector = entry1->sector_count;
+            all_storange = all_sector / 2048;
+            print << "Storage: " << all_storange << " MB\n";
 
-        if (entry1->boot_indicator == 0x80) print << "Yes\n"; else print << "No\n";
-    } else {
-        print.Color(0x0C);
-        print << "No Partition Found on Entry 1!\n";
-        print << "Boot flag: " << (unsigned int)entry1->boot_indicator << "\n";
-        print << "System ID: " << (unsigned int)entry1->partition_type << "\n";
-        print << "Sector count: " << entry1->sector_count << "\n";
-        print << "Magic Byte 1: " << (unsigned int)buffer[510] << "\n";
-        print << "Magic Byte 2: " << (unsigned int)buffer[511] << "\n";
-        print.RestoreColor();
-        return;
+            if (entry1->boot_indicator == 0x80) print << "Yes\n"; else print << "No\n";
+        } else {
+            print.Color(0x0C);
+            print << "No Partition Found on Entry 1!\n";
+            print << "Boot flag: " << (unsigned int)entry1->boot_indicator << "\n";
+            print << "System ID: " << (unsigned int)entry1->partition_type << "\n";
+            print << "Sector count: " << entry1->sector_count << "\n";
+            print << "Magic Byte 1: " << (unsigned int)buffer[510] << "\n";
+            print << "Magic Byte 2: " << (unsigned int)buffer[511] << "\n";
+            print.RestoreColor();
+            return;
+        }
     }
 
     Screen::SysSpeaker(1000); // i tried this on virtualbox but i don't heard anything 
