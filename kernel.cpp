@@ -412,5 +412,6 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
         }
             char str[2] = {text, '\0'};
             print << str;               
+        }
     }
 }
