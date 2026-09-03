@@ -362,6 +362,28 @@ struct __attribute__((packed)) MBRPartitionEntry {
 };
 AHCIDriver ahci_driver;
 NVMeDriver nvme_driver;
+
+void customFont() {
+    volatile unsigned char* font = (volatile unsigned char*)0xF0000 + 0xFA6E; 
+    Screen::output(0x3C4, 0x02); Screen::output(0x3C5, 0x04);
+    Screen::output(0x3C4, 0x04); Screen::output(0x3C5, 0x07);
+    Screen::output(0x3CE, 0x05); Screen::output(0x3CF, 0x00);
+    Screen::output(0x3CE, 0x06); Screen::output(0x3CF, 0x04);
+    volatile char* vga_font = (volatile char*)0xA0000;
+
+    for (int i = 0; i < 256; i++) {
+        for (int j = 0; j < 8; j++) {
+            unsigned char line = font[i * 8 + j];
+            vga_font[i * 32 + (j * 2)]     = line;
+            vga_font[i * 32 + (j * 2 + 1)] = line;
+        }
+    }
+    Screen::output(0x3C4, 0x02); Screen::output(0x3C5, 0x03);
+    Screen::output(0x3C4, 0x04); Screen::output(0x3C5, 0x02);
+    Screen::output(0x3CE, 0x05); Screen::output(0x3CF, 0x10);
+    Screen::output(0x3CE, 0x06); Screen::output(0x3CF, 0x0E);
+}
+
 extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     Screen print;
     Screen boot;
