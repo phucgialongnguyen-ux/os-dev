@@ -425,6 +425,7 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     for(volatile int i = 0; i < 20000000; i++){} 
     Screen::SysSpeakerStop();
     print.SomethingBeatifull();
+    customFont();
     //print.Color(0x0A);
     //print << "Hello World!!!!!! \n";
     //print.RestoreColor();
