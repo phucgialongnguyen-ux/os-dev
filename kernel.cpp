@@ -329,7 +329,7 @@ class Screen{
                         if(data != 0xFFFFFFFF){
                             unsigned short vendor_id = (unsigned short)(data & 0xFFFF);
                             unsigned short device_id = (unsigned short)((data >> 16) & 0xFFFF);
-                            *this << "Bus: " << bus << ", Device: " << device << ", Function: " << function << "\n";
+                            *this << "Vendor: 0x" << vendor_id << ", Device: 0x" << device_id << "\n";
                         }
                     }
                 }
