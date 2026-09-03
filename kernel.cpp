@@ -319,14 +319,17 @@ class Screen{
             }
         }
         inline void PCI_BUS(){
-            unsigned int bus, device, function = 0;
-            for(int i = 0; i < 255; i++){
-                for(int j = 0; j < 32; j++){
-                    unsigned int offset = 0x00;
-                    unsigned int address = (1U << 31) | (bus << 16) | (device << 11) | (function << 8) | (offset & 0xFC);
-                    output32bit(0xCF8, address);
-                    input32bit(0xCFC);
-
+            for(unsigned int bus = 0; bus < 256; bus++){
+                for(unsigned int device = 0; device < 32; device++){
+                    for(unsigned int function = 0; function < 8; function++){
+                        unsigned int offset = 0x00;
+                        unsigned int address = (1 << 31) | (bus << 16) | (device << 11) | (function << 8) | (offset & 0xFC);
+                        output32bit(0xCF8, address);
+                        unsigned int data = input32bit(0xCFC);
+                        if(data != 0xFFFFFFFF){
+                            *this << "Bus: " << bus << ", Device: " << device << ", Function: " << function << "\n";
+                        }
+                    }
                 }
             }
         }
