@@ -323,10 +323,12 @@ class Screen{
                 for(unsigned int device = 0; device < 32; device++){
                     for(unsigned int function = 0; function < 8; function++){
                         unsigned int offset = 0x00;
-                        unsigned int address = (1 << 31) | (bus << 16) | (device << 11) | (function << 8) | (offset & 0xFC);
+                        unsigned int address = (1U << 31) | (bus << 16) | (device << 11) | (function << 8) | (offset & 0xFC);
                         output32bit(0xCF8, address);
                         unsigned int data = input32bit(0xCFC);
                         if(data != 0xFFFFFFFF){
+                            unsigned short vendor_id = (unsigned short)(data & 0xFFFF);
+                            unsigned short device_id = (unsigned short)((data >> 16) & 0xFFFF);
                             *this << "Bus: " << bus << ", Device: " << device << ", Function: " << function << "\n";
                         }
                     }
@@ -392,6 +394,8 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     print.Color(0x0A);
     print << "Write something! \n";
     print.RestoreColor();
+
+    print.PCI_BUS();
 
     constexpr unsigned char cmd_storage[] = {"storage"};
     constexpr unsigned char cmd_help[] = {"help"};
