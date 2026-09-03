@@ -101,7 +101,14 @@ class Screen{
         static inline void output16bit(unsigned short port, unsigned short val){
             asm volatile("outw %0, %1" :: "a"(val), "Nd"(port));
         }
-
+        static inline unsigned int input32bit(unsigned short port){
+            unsigned int ret;
+            asm volatile("inl %1, %0" : "=a"(ret) : "Nd"(port));
+            return ret;
+        }
+        static inline void output32bit(unsigned short port, unsigned int val){
+            asm volatile("outl %0, %1" :: "a"(val), "Nd"(port));
+        }
         static inline void SysSpeaker(unsigned int freq){
             unsigned int base_freq = 1193180;
             unsigned int div = base_freq  / freq;
@@ -311,6 +318,18 @@ class Screen{
                 ptr[i] = input16bit(0x1F0);
             }
         }
+        inline void PCI_BUS(){
+            unsigned int bus, device, function = 0;
+            for(int i = 0; i < 255; i++){
+                for(int j = 0; j < 32; j++){
+                    unsigned int offset = 0x00;
+                    unsigned int address = (1U << 31) | (bus << 16) | (device << 11) | (function << 8) | (offset & 0xFC);
+                    output32bit(0xCF8, address);
+                    input32bit(0xCFC);
+
+                }
+            }
+        }
 };
 struct __attribute__((packed)) MBRPartitionEntry {
     unsigned char  boot_indicator; // I'll copy and paste this bullshit too anyway
@@ -380,36 +399,6 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     while(1){
         char text = Screen::Keyboard_Driver();
         if(text != 0){
-        if (text == '\n') {
-            print << "\n";
-            cmd_buffer[buffer_index] = '\0';
-            bool is_storage = true;
-            for (int i = 0; i < 7; i++) {
-                if (cmd_buffer[i] != cmd_storage[i]) { is_storage = false; break; }
-            }
-            bool is_help = true;
-            for (int i = 0; i < 4; i++) {
-                if (cmd_buffer[i] != cmd_help[i]) { is_help = false; break; }
-            }
-            if (is_storage && cmd_buffer[7] == '\0') {
-                print.Color(0x0A);
-                print << "[yoursOS Storage Info]\n";
-                all_sector = entry1->sector_count;
-                all_storange = all_sector / 2048;
-                print << "Storage: " << all_storange << " MB\n";
-                print.RestoreColor();
-            } 
-            else if (is_help && cmd_buffer[4] == '\0') {
-                print << "Available commands: storage, help, clear\n";
-            } 
-            else if (buffer_index > 0) {
-                print.Color(0x0C);
-                print << "Unknown command: " << cmd_buffer << "\n";
-                print.RestoreColor();
-            }
-            buffer_index = 0;
-            print << "yoursOS> ";
-        }
             char str[2] = {text, '\0'};
             print << str;               
         }
