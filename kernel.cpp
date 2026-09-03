@@ -163,10 +163,12 @@ class Screen{
                 }
                 if(text[i] == '\b'){
                     if(curr_pos % 160 != 0){
-                        curr_pos -= 2;
-                        vga_display[curr_pos] = ' ';
-                        vga_display[curr_pos + 1] = 0x07;
-                        continue;
+                        if(curr_pos > curr_pos_limit){
+                            curr_pos -= 2;
+                            vga_display[curr_pos] = ' ';
+                            vga_display[curr_pos + 1] = 0x07;
+                            continue;
+                        }
                     }
                 }
 
@@ -401,13 +403,13 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     for(volatile int i = 0; i < 20000000; i++){} 
     Screen::SysSpeakerStop();
     print.SomethingBeatifull();
-    print.Color(0x0A);
-    print << "Hello World!!!!!! \n";
-    print.RestoreColor();
-
-    print.Color(0x0A);
-    print << "Write something! \n";
-    print.RestoreColor();
+    //print.Color(0x0A);
+    //print << "Hello World!!!!!! \n";
+    //print.RestoreColor();
+    //rest in peace my friends "hello world", i won't forget you!! i promise.
+    //print.Color(0x0A);
+    //print << "Write something! \n";
+    //print.RestoreColor();
 
     print.PCI_BUS();
 
