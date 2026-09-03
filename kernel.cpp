@@ -442,7 +442,8 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     Screen print;
     Screen boot;
     print.CleanUp(4000);
-
+    print.Font();
+    print.SomethingBeatifull();
     boot.CPUBootChecker();
 
     unsigned char buffer[512];
@@ -489,7 +490,6 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     //print.RestoreColor();
 
     print.PCI_BUS();
-    print.Font();
     constexpr unsigned char cmd_storage[] = {"storage"};
     constexpr unsigned char cmd_help[] = {"help"};
     char cmd_buffer[32];
