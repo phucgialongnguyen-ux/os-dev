@@ -10,6 +10,7 @@ class Screen{
     private:
         volatile char* vga_display  = (volatile char*)0xB8000; 
         static inline int curr_pos = 0;
+        static inline int curr_pos_limit = 0;
         char curr_color = 0x07;
         volatile char* vga_graphic = (volatile char*)0xA0000;
 
@@ -267,8 +268,8 @@ class Screen{
                 is_extended = false;
                 
                 // this too
-                if(Scancode == 0x48){ if(curr_pos >= 160) curr_pos -= 160; }        // LÊN
-                else if(Scancode == 0x50){ if(curr_pos + 160 < 4000) curr_pos += 160; } // XUỐNG
+                if(Scancode == 0x48){}        // LÊN, khong con len duoc :)
+                else if(Scancode == 0x50){} // XUỐNG, Khong con xuong duoc :)
                 else if(Scancode == 0x4B){ if(curr_pos >= 2) curr_pos -= 2; }         // TRÁI
                 else if(Scancode == 0x4D){ if(curr_pos + 2 < 4000) curr_pos += 2; }     // PHẢI
 
@@ -284,6 +285,19 @@ class Screen{
                 return c;
             }
             return 0;
+        }
+        void SomethingBeatifull(){
+            Color(0x0B);
+            *this << "yoursOS ";
+            Color(0x07);
+            *this << "user ";
+            Color(0x0D);
+            *this << "- ";
+            Color(0x0A);
+            *this << "$ ";
+            RestoreColor();
+            curr_pos_limit = curr_pos;
+
         }
         static inline void Primary_ATA_Controller(){
             while(((input(0x1F7) >> 7) & 1) == 1){}
@@ -329,9 +343,7 @@ class Screen{
                         if(data != 0xFFFFFFFF){
                             unsigned short vendor_id = (unsigned short)(data & 0xFFFF);
                             unsigned short device_id = (unsigned short)((data >> 16) & 0xFFFF);
-                            if(vendor_id == 0x8086 && device_id == 0x100F){
-                                *this << "Found INTEL E1000 at " << "Vendor: 0x" << vendor_id << ", Device: 0x" << device_id << "\n";
-                            }
+                            *this << "Vendor: 0x" << vendor_id << ", Device: 0x" << device_id << "\n";
                         }
                     }
                 }
@@ -388,7 +400,7 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     Screen::SysSpeaker(1000); // i tried this on virtualbox but i don't heard anything 
     for(volatile int i = 0; i < 20000000; i++){} 
     Screen::SysSpeakerStop();
-
+    print.SomethingBeatifull();
     print.Color(0x0A);
     print << "Hello World!!!!!! \n";
     print.RestoreColor();
@@ -402,14 +414,19 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     constexpr unsigned char cmd_storage[] = {"storage"};
     constexpr unsigned char cmd_help[] = {"help"};
     char cmd_buffer[32];
-    int buffer_index = 0;
+    int buffer_index = 0;// maybe.. in the future, i'll make 100 cmd
 
     Screen::UpdateCursor();
     while(1){
         char text = Screen::Keyboard_Driver();
         if(text != 0){
-            char str[2] = {text, '\0'};
-            print << str;               
+            if(text == '\n'){
+                print << "\n";
+                print.SomethingBeatifull(); //Sorry but no more 
+            }  // char str[2] = {text, '\0'}; :( rip
+            else{
+                print << text;
+            } 
         }
     }
 }
