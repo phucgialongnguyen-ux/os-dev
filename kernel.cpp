@@ -441,7 +441,7 @@ NVMeDriver nvme_driver;
 extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     Screen print;
     Screen boot;
-    print.CleanUp();
+    print.CleanUp(4000);
 
     boot.CPUBootChecker();
 
