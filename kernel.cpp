@@ -351,6 +351,13 @@ class Screen{
                             unsigned short vendor_id = (unsigned short)(data & 0xFFFF);
                             unsigned short device_id = (unsigned short)((data >> 16) & 0xFFFF);
                             *this << "Vendor: 0x" << vendor_id << ", Device: 0x" << device_id << "\n";
+                            if(vendor_id == 0x8086){
+                                unsigned int adr_bar0 = (1U << 31) | (bus << 16) | (device << 11) | (function << 8) | 0x10;
+                                output32bit(0xCF8, adr_bar0);
+                                unsigned int bar0_raw = input32bit(0xCFC);
+                                unsigned int mmio_base = bar0_raw & 0xFFFFFFF0;
+                                *this << "BAR0 MMIO Base Address: 0x" << mmio_base << "\n";
+                            }
                         }
                         if(function == 0){
                             unsigned int data2 = (1U << 31) | (bus << 16) | (device << 11) | 0x0C;
@@ -365,7 +372,7 @@ class Screen{
                 }
             }
         }
-        
+
 };
 struct __attribute__((packed)) MBRPartitionEntry {
     unsigned char  boot_indicator; // I'll copy and paste this bullshit too anyway
