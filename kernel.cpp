@@ -382,7 +382,7 @@ class Screen{
                                 unsigned int adr_bar0 = (1U << 31) | (bus << 16) | (device << 11) | (function << 8) | 0x10;
                                 output32bit(0xCF8, adr_bar0);
                                 unsigned int bar0_raw = input32bit(0xCFC);
-                                unsigned int mmio_base = bar0_raw & 0xFFFFFFF0;
+                                volatile unsigned int* mmio_base = (volatile unsigned int*)(bar0_raw & 0xFFFFFFF0);
                                 *this << "BAR0 MMIO Base Address: 0x" << (void*)mmio_base << "\n";
                             }
                         }
@@ -399,7 +399,12 @@ class Screen{
                 }    
             }
         }
-
+        inline void Clear_Interrupt(){
+            unsigned int offset = 0x000D8;
+            volatile unsigned int* mmio;
+            mmio[0x000D8 / 4] = 0xFFFFFFFF;
+            
+        }
 };
 struct __attribute__((packed)) MBRPartitionEntry {
     unsigned char  boot_indicator; // I'll copy and paste this bullshit too anyway
