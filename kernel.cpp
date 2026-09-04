@@ -378,12 +378,24 @@ class Screen{
                             unsigned short vendor_id = (unsigned short)(data & 0xFFFF);
                             unsigned short device_id = (unsigned short)((data >> 16) & 0xFFFF);
                             *this << "Vendor: 0x" << (void*)vendor_id << ", Device: 0x" << (void*)device_id << "\n";
-                            if(vendor_id == 0x8086){
+                            if (vendor_id == 0x8086) {
                                 unsigned int adr_bar0 = (1U << 31) | (bus << 16) | (device << 11) | (function << 8) | 0x10;
                                 output32bit(0xCF8, adr_bar0);
                                 unsigned int bar0_raw = input32bit(0xCFC);
                                 volatile unsigned int* mmio_base = (volatile unsigned int*)(bar0_raw & 0xFFFFFFF0);
                                 *this << "BAR0 MMIO Base Address: 0x" << (void*)mmio_base << "\n";
+                                Reset(mmio_base);
+                                Clear_Interrupt(mmio_base);
+                                unsigned char mac[6];
+                                Read_MAC(mmio_base);
+                                *this << "MAC Address: ";
+                                for(int i = 0; i < 6; i++) {
+                                    *this << (unsigned int)mac[i];
+                                    if(i < 5) *this << ":";
+                                }
+                                *this << "\n";
+                                Init_RX(mmio_base);
+                                *this << "e1000 RX Engine Initialized successfully!\n";
                             }
                         }
                         if(function == 0){
@@ -419,7 +431,31 @@ class Screen{
             mac[3] = (unsigned char)((mac_low >> 24) & 0xFF);
             mac[4] = (unsigned char)(mac_high & 0xFF);
             mac[5] = (unsigned char)((mac_high >> 8) & 0xFF);
+            *this << "MAC Address: ";
+            for(int i = 0; i < 6; i++) {
+                *this << (unsigned int)mac[i];
+                if(i < 5) *this << ":";   
+            }    
+            *this << "\n";
         }
+
+static Receive_Descriptor rx_ring[32] __attribute__((aligned(16))); // Im copy and paste this part;
+static unsigned char rx_buffers[32][2048] __attribute__((aligned(16))); // this too
+
+inline void Init_RX(volatile unsigned int* mmio) { // this one too
+    for (int i = 0; i < 32; i++) {
+        rx_ring[i].buffer_addr = (unsigned long long)&rx_buffers[i][0];
+        rx_ring[i].status = 0; 
+    }
+    unsigned long long ring_phys_addr = (unsigned long long)&rx_ring[0]; 
+    mmio[0x02800 / 4] = (unsigned int)(ring_phys_addr & 0xFFFFFFFF);        
+    mmio[0x02804 / 4] = (unsigned int)((ring_phys_addr >> 32) & 0xFFFFFFFF); 
+    mmio[0x02808 / 4] = 32 * sizeof(Receive_Descriptor);
+    mmio[0x02810 / 4] = 0;  
+    mmio[0x02818 / 4] = 31; 
+    unsigned int rctl = (1 << 1) | (1 << 15) | (1 << 26);
+    mmio[0x00100 / 4] = rctl;
+}
 };
 struct __attribute__((packed)) MBRPartitionEntry {
     unsigned char  boot_indicator; // I'll copy and paste this bullshit too anyway
