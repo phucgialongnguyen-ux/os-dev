@@ -234,6 +234,33 @@ class Screen{
             *this << buffer;
             return *this;
         }
+        inline Screen& operator<<(void* pr) {
+            char buffer[32]; 
+            int i = 0;
+            unsigned long long num = (unsigned long long)pr; 
+            if (num == 0) {
+                buffer[i++] = '0';
+            } else {
+            int start = 0;
+            while (num > 0) {
+                unsigned long long digit = num % 16;
+                if (digit < 10) {
+                buffer[i++] = digit + '0';
+                } else {
+                    buffer[i++] = digit - 10 + 'A';
+                }
+                num /= 16;
+            }
+            for (int j = start, k = i - 1; j < k; j++, k--) {
+                char temp = buffer[j];
+                buffer[j] = buffer[k];
+                buffer[k] = temp;
+            }
+        }
+        buffer[i] = '\0';
+        *this << buffer;
+        return *this;
+    }
         inline void RestoreColor(){
             curr_color = 0x07;
         }
@@ -350,13 +377,13 @@ class Screen{
                         if(data != 0xFFFFFFFF){
                             unsigned short vendor_id = (unsigned short)(data & 0xFFFF);
                             unsigned short device_id = (unsigned short)((data >> 16) & 0xFFFF);
-                            *this << "Vendor: 0x" << vendor_id << ", Device: 0x" << device_id << "\n";
+                            *this << "Vendor: 0x" << (void*)vendor_id << ", Device: 0x" << (void*)device_id << "\n";
                             if(vendor_id == 0x8086){
                                 unsigned int adr_bar0 = (1U << 31) | (bus << 16) | (device << 11) | (function << 8) | 0x10;
                                 output32bit(0xCF8, adr_bar0);
                                 unsigned int bar0_raw = input32bit(0xCFC);
                                 unsigned int mmio_base = bar0_raw & 0xFFFFFFF0;
-                                *this << "BAR0 MMIO Base Address: 0x" << mmio_base << "\n";
+                                *this << "BAR0 MMIO Base Address: 0x" << (void*)mmio_base << "\n";
                             }
                         }
                         if(function == 0){
@@ -369,7 +396,7 @@ class Screen{
                             }
                         }
                     }
-                }
+                }    
             }
         }
 
@@ -380,7 +407,7 @@ struct __attribute__((packed)) MBRPartitionEntry {
     unsigned char  partition_type; 
     unsigned char  end_chs[3];     
     unsigned int   start_lba;     
-    unsigned int   sector_count;   
+    unsigned int   sector_count;    
 };
 struct __attribute__((packed)) Transmit_Descriptor{
     unsigned long long buffer_addr;
