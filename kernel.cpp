@@ -413,7 +413,12 @@ class Screen{
             unsigned int mac_low = mmio[0x05400 / 4];
             unsigned int mac_high = mmio[0x05404 / 4];
             unsigned char mac[6];
-            mac[0] = mac_low & 0xFF;
+            mac[0] = (unsigned char)(mac_low & 0xFF);
+            mac[1] = (unsigned char)((mac_low >> 8) & 0xFF);
+            mac[2] = (unsigned char)((mac_low >> 16) & 0xFF);
+            mac[3] = (unsigned char)((mac_low >> 24) & 0xFF);
+            mac[4] = (unsigned char)(mac_high & 0xFF);
+            mac[5] = (unsigned char)((mac_high >> 8) & 0xFF);
         }
 };
 struct __attribute__((packed)) MBRPartitionEntry {
@@ -425,22 +430,24 @@ struct __attribute__((packed)) MBRPartitionEntry {
     unsigned int   sector_count;    
 };
 struct __attribute__((packed)) Transmit_Descriptor{
-    unsigned long long buffer_addr;
-    unsigned short length;
-    unsigned char cso;
-    unsigned char cmd;
-    unsigned char status;
-    unsigned char css;
-    unsigned short special;
+    volatile unsigned long long buffer_addr;
+    volatile unsigned short length;
+    volatile unsigned char cso;
+    volatile unsigned char cmd;
+    volatile unsigned char status;
+    volatile unsigned char css;
+    volatile unsigned short special;
 };
 struct __attribute__((packed)) Receive_Descriptor{
-    unsigned long long buffer_addr;
-    unsigned short length;
-    unsigned short checksum;
-    unsigned char status;
-    unsigned char errors;
-    unsigned short special;
+    volatile unsigned long long buffer_addr;
+    volatile unsigned short length;
+    volatile unsigned short checksum;
+    volatile unsigned char status;
+    volatile unsigned char errors;
+    volatile unsigned short special;
 };
+static_assert(sizeof(Transmit_Descriptor) == 16, "This shit struct size must be 16 bytes");
+static_assert(sizeof(Receive_Descriptor) == 16, "This shit struct size must be 16 bytes");
 AHCIDriver ahci_driver;
 NVMeDriver nvme_driver;
 extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
