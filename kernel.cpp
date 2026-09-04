@@ -338,18 +338,34 @@ class Screen{
                 for(unsigned int device = 0; device < 32; device++){
                     for(unsigned int function = 0; function < 8; function++){
                         unsigned int offset = 0x00;
-                        unsigned int address = (1U << 31) | (bus << 16) | (device << 11) | (function << 8) | (offset & 0xFC);
+                        unsigned int address = (1U << 31) | (bus << 16) | (device << 11) | (function << 8) | offset;
                         output32bit(0xCF8, address);
                         unsigned int data = input32bit(0xCFC);
+                        if(data == 0xFFFFFFFF){
+                            if(function == 0){
+                                break;
+                            }
+                            continue;
+                        }
                         if(data != 0xFFFFFFFF){
                             unsigned short vendor_id = (unsigned short)(data & 0xFFFF);
                             unsigned short device_id = (unsigned short)((data >> 16) & 0xFFFF);
                             *this << "Vendor: 0x" << vendor_id << ", Device: 0x" << device_id << "\n";
                         }
+                        if(function == 0){
+                            unsigned int data2 = (1U << 31) | (bus << 16) | (device << 11) | 0x0C;
+                            output32bit(0xCF8, data2);
+                            unsigned int data3 = input32bit(0xCFC);
+                            unsigned char header_type = (unsigned char)((data3 >> 16) & 0xFF);
+                            if((header_type & 0x80) == 0){
+                                break;
+                            }
+                        }
                     }
                 }
             }
         }
+        
 };
 struct __attribute__((packed)) MBRPartitionEntry {
     unsigned char  boot_indicator; // I'll copy and paste this bullshit too anyway
@@ -358,6 +374,23 @@ struct __attribute__((packed)) MBRPartitionEntry {
     unsigned char  end_chs[3];     
     unsigned int   start_lba;     
     unsigned int   sector_count;   
+};
+struct __attribute__((packed)) Transmit_Descriptor{
+    unsigned long long buffer_addr;
+    unsigned short length;
+    unsigned char cso;
+    unsigned char cmd;
+    unsigned char status;
+    unsigned char css;
+    unsigned short special;
+};
+struct __attribute__((packed)) Receive_Descriptor{
+    unsigned long long buffer_addr;
+    unsigned short length;
+    unsigned short checksum;
+    unsigned char status;
+    unsigned char errors;
+    unsigned short special;
 };
 AHCIDriver ahci_driver;
 NVMeDriver nvme_driver;
