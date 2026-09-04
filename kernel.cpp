@@ -442,20 +442,20 @@ class Screen{
 static Receive_Descriptor rx_ring[32] __attribute__((aligned(16))); // Im copy and paste this part;
 static unsigned char rx_buffers[32][2048] __attribute__((aligned(16))); // this too
 
-inline void Init_RX(volatile unsigned int* mmio) { // this one too
-    for (int i = 0; i < 32; i++) {
-        rx_ring[i].buffer_addr = (unsigned long long)&rx_buffers[i][0];
-        rx_ring[i].status = 0; 
+    inline void Init_RX(volatile unsigned int* mmio) { // this one too
+        for(int i = 0; i < 32; i++) {
+            rx_ring[i].buffer_addr = (unsigned long long)&rx_buffers[i][0];
+            rx_ring[i].status = 0; 
+        }
+        unsigned long long ring_phys_addr = (unsigned long long)&rx_ring[0]; 
+        mmio[0x02800 / 4] = (unsigned int)(ring_phys_addr & 0xFFFFFFFF);        
+        mmio[0x02804 / 4] = (unsigned int)((ring_phys_addr >> 32) & 0xFFFFFFFF); 
+        mmio[0x02808 / 4] = 32 * sizeof(Receive_Descriptor);
+        mmio[0x02810 / 4] = 0;  
+        mmio[0x02818 / 4] = 31; 
+        unsigned int rctl = (1 << 1) | (1 << 15) | (1 << 26);
+        mmio[0x00100 / 4] = rctl;
     }
-    unsigned long long ring_phys_addr = (unsigned long long)&rx_ring[0]; 
-    mmio[0x02800 / 4] = (unsigned int)(ring_phys_addr & 0xFFFFFFFF);        
-    mmio[0x02804 / 4] = (unsigned int)((ring_phys_addr >> 32) & 0xFFFFFFFF); 
-    mmio[0x02808 / 4] = 32 * sizeof(Receive_Descriptor);
-    mmio[0x02810 / 4] = 0;  
-    mmio[0x02818 / 4] = 31; 
-    unsigned int rctl = (1 << 1) | (1 << 15) | (1 << 26);
-    mmio[0x00100 / 4] = rctl;
-}
 };
 struct __attribute__((packed)) MBRPartitionEntry {
     unsigned char  boot_indicator; // I'll copy and paste this bullshit too anyway
