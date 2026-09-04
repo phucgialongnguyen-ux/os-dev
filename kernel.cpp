@@ -399,11 +399,21 @@ class Screen{
                 }    
             }
         }
-        inline void Clear_Interrupt(){
+        inline void Reset(volatile unsigned int* mmio){
+            unsigned int offset = 0x00;
+            mmio[0x00 / 4] |= (1 << 26);
+            for(volatile int i = 0; i < 2000 ; i++){}
+        }
+        inline void Clear_Interrupt(volatile unsigned int* mmio){
             unsigned int offset = 0x000D8;
-            volatile unsigned int* mmio;
             mmio[0x000D8 / 4] = 0xFFFFFFFF;
             
+        }
+        inline void Read_MAC(volatile unsigned int* mmio){
+            unsigned int mac_low = mmio[0x05400 / 4];
+            unsigned int mac_high = mmio[0x05404 / 4];
+            unsigned char mac[6];
+            mac[0] = mac_low & 0xFF;
         }
 };
 struct __attribute__((packed)) MBRPartitionEntry {
