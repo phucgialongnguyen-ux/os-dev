@@ -456,7 +456,24 @@ static unsigned char rx_buffers[32][2048] __attribute__((aligned(16))); // this 
         unsigned int rctl = (1 << 1) | (1 << 15) | (1 << 26);
         mmio[0x00100 / 4] = rctl;
     }
-};
+static Transmit_Descriptor tx_ring[32] __attribute__((aligned(16)));
+static unsigned char tx_buffers[32][2048] __attribute__((aligned(16))); 
+    inline void Init_TX(volatile unsigned int* mmio) { 
+        for(int i = 0; i < 32; i++) {
+            tx_ring[i].buffer_addr = (unsigned long long)&tx_buffers[i][0];
+            tx_ring[i].cmd = 0;
+            tx_ring[i].status = 1; 
+        }
+        unsigned long long ring_phys_addr = (unsigned long long)&tx_ring[0]; 
+        mmio[0x03800 / 4] = (unsigned int)(ring_phys_addr & 0xFFFFFFFF);        
+        mmio[0x03804 / 4] = (unsigned int)((ring_phys_addr >> 32) & 0xFFFFFFFF); 
+        mmio[0x03808 / 4] = 32 * sizeof(Transmit_Descriptor);
+        mmio[0x03810 / 4] = 0;  
+        mmio[0x03818 / 4] = 0; 
+        unsigned int rctl = (1 << 1) | (1 << 3);
+        mmio[0x00400 / 4] = rctl;
+    }
+};      
 struct __attribute__((packed)) MBRPartitionEntry {
     unsigned char  boot_indicator; // I'll copy and paste this bullshit too anyway
     unsigned char  start_chs[3];  
