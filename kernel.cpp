@@ -489,8 +489,20 @@ static inline unsigned char tx_buffers[32][2048] __attribute__((aligned(16)));
         mmio[0x03808 / 4] = 32 * sizeof(Transmit_Descriptor);
         mmio[0x03810 / 4] = 0;  
         mmio[0x03818 / 4] = 0; 
-        unsigned int rctl = (1 << 1) | (1 << 3);
+        unsigned int rctl = (1 << 1) | (1 << 3) | (0x3F << 12);
         mmio[0x00400 / 4] = rctl;
+    }
+    inline void send_packet(volatile unsigned int* mmio, const unsigned char* data, unsigned short length){
+        static int tx = 0; 
+        
+        for(int i = 0; i < length; i++){
+            tx_buffers[tx][i] = data[i];
+        }
+        tx_ring[tx].length = length;
+        tx_ring[tx].status = 0;
+        tx_ring[tx].cmd = (1 << 0) | (1 << 1) | (1 << 3);
+        tx = (tx + 1) % 32;
+        mmio[0x03818 / 4] = tx;
     }
 };      
 struct __attribute__((packed)) MBRPartitionEntry {
