@@ -558,11 +558,9 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
         'y', 'o', 'u', 'r', 's', 'O', 'S', '!' 
 
     };
-
     Screen::SysSpeaker(1000); // i tried this on virtualbox but i don't heard anything 
     for(volatile int i = 0; i < 200000; i++){} 
     Screen::SysSpeakerStop();
-    
     //print.Color(0x0A);
     //print << "Hello World!!!!!! \n";
     //print.RestoreColor();
@@ -570,7 +568,6 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     //print.Color(0x0A);
     //print << "Write something! \n";
     //print.RestoreColor();
-
     print.PCI_BUS();
     constexpr unsigned char cmd_storage[] = {"storage"};
     constexpr unsigned char cmd_help[] = {"help"};
