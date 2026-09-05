@@ -1,5 +1,6 @@
 #include "ahci.h"
 #include "nvme.h"
+typedef unsigned int uintptr_t;
 __attribute__((section(".multiboot"))) const unsigned int boot_checksum[]{
         0x1BADB002,
         0x00,
@@ -395,13 +396,13 @@ class Screen{
                         if(data != 0xFFFFFFFF){
                             unsigned short vendor_id = (unsigned short)(data & 0xFFFF);
                             unsigned short device_id = (unsigned short)((data >> 16) & 0xFFFF);
-                            *this << "Vendor: 0x" << (void*)vendor_id << ", Device: 0x" << (void*)device_id << "\n";
+                            *this << "Vendor: 0x" << (void*)(uintptr_t)vendor_id << ", Device: 0x" << (void*)(uintptr_t)device_id << "\n";
                             if (vendor_id == 0x8086) {
                                 unsigned int adr_bar0 = (1U << 31) | (bus << 16) | (device << 11) | (function << 8) | 0x10;
                                 output32bit(0xCF8, adr_bar0);
                                 unsigned int bar0_raw = input32bit(0xCFC);
                                 volatile unsigned int* mmio_base = (volatile unsigned int*)(bar0_raw & 0xFFFFFFF0);
-                                *this << "BAR0 MMIO Base Address: 0x" << (void*)mmio_base << "\n";
+                                *this << "BAR0 MMIO Base Address: 0x" << (void*)(uintptr_t)mmio_base << "\n";
                                 Reset(mmio_base);
                                 Clear_Interrupt(mmio_base);
                                 unsigned char mac[6];
