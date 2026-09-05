@@ -5,7 +5,25 @@ __attribute__((section(".multiboot"))) const unsigned int boot_checksum[]{
         0x00,
         (unsigned int)-(0x1BADB002)
 };
-
+struct __attribute__((packed)) Transmit_Descriptor{
+    volatile unsigned long long buffer_addr;
+    volatile unsigned short length;
+    volatile unsigned char cso;
+    volatile unsigned char cmd;
+    volatile unsigned char status;
+    volatile unsigned char css;
+    volatile unsigned short special;
+};
+struct __attribute__((packed)) Receive_Descriptor{
+    volatile unsigned long long buffer_addr;
+    volatile unsigned short length;
+    volatile unsigned short checksum;
+    volatile unsigned char status;
+    volatile unsigned char errors;
+    volatile unsigned short special;
+};
+static_assert(sizeof(Transmit_Descriptor) == 16, "This shit struct size must be 16 bytes");
+static_assert(sizeof(Receive_Descriptor) == 16, "This shit struct size must be 16 bytes");
 class Screen{
     private:
         volatile char* vga_display  = (volatile char*)0xB8000; 
@@ -482,25 +500,6 @@ struct __attribute__((packed)) MBRPartitionEntry {
     unsigned int   start_lba;     
     unsigned int   sector_count;    
 };
-struct __attribute__((packed)) Transmit_Descriptor{
-    volatile unsigned long long buffer_addr;
-    volatile unsigned short length;
-    volatile unsigned char cso;
-    volatile unsigned char cmd;
-    volatile unsigned char status;
-    volatile unsigned char css;
-    volatile unsigned short special;
-};
-struct __attribute__((packed)) Receive_Descriptor{
-    volatile unsigned long long buffer_addr;
-    volatile unsigned short length;
-    volatile unsigned short checksum;
-    volatile unsigned char status;
-    volatile unsigned char errors;
-    volatile unsigned short special;
-};
-static_assert(sizeof(Transmit_Descriptor) == 16, "This shit struct size must be 16 bytes");
-static_assert(sizeof(Receive_Descriptor) == 16, "This shit struct size must be 16 bytes");
 AHCIDriver ahci_driver;
 NVMeDriver nvme_driver;
 extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
