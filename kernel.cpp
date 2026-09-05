@@ -439,7 +439,7 @@ class Screen{
             *this << "\n";
         }
 
-static Receive_Descriptor rx_ring[32] __attribute__((aligned(16))); // Im copy and paste this part;
+static Receive_Descriptor rx_ring[32] __attribute__((aligned(16))); // Im copy and paste this part
 static unsigned char rx_buffers[32][2048] __attribute__((aligned(16))); // this too
 
     inline void Init_RX(volatile unsigned int* mmio) { // this one too
