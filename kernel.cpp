@@ -458,8 +458,8 @@ class Screen{
             *this << "\n";
         }
 
-static Receive_Descriptor rx_ring[32] __attribute__((aligned(16))); // Im copy and paste this part
-static unsigned char rx_buffers[32][2048] __attribute__((aligned(16))); // this too
+ static inline  Receive_Descriptor rx_ring[32] __attribute__((aligned(16))); // Im copy and paste this part
+ static inline unsigned char rx_buffers[32][2048] __attribute__((aligned(16))); // this too
 
     inline void Init_RX(volatile unsigned int* mmio) { // this one too
         for(int i = 0; i < 32; i++) {
@@ -475,8 +475,8 @@ static unsigned char rx_buffers[32][2048] __attribute__((aligned(16))); // this 
         unsigned int rctl = (1 << 1) | (1 << 15) | (1 << 26);
         mmio[0x00100 / 4] = rctl;
     }
-static Transmit_Descriptor tx_ring[32] __attribute__((aligned(16)));
-static unsigned char tx_buffers[32][2048] __attribute__((aligned(16))); 
+static inline Transmit_Descriptor tx_ring[32] __attribute__((aligned(16)));
+static inline unsigned char tx_buffers[32][2048] __attribute__((aligned(16))); 
     inline void Init_TX(volatile unsigned int* mmio) { 
         for(int i = 0; i < 32; i++) {
             tx_ring[i].buffer_addr = (unsigned long long)&tx_buffers[i][0];
@@ -541,7 +541,7 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     }
 
     Screen::SysSpeaker(1000); // i tried this on virtualbox but i don't heard anything 
-    for(volatile int i = 0; i < 20000000; i++){} 
+    for(volatile int i = 0; i < 200000; i++){} 
     Screen::SysSpeakerStop();
  
     //print.Color(0x0A);
