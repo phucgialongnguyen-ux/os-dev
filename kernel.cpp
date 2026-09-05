@@ -401,12 +401,12 @@ class Screen{
                                 unsigned int adr_bar0 = (1U << 31) | (bus << 16) | (device << 11) | (function << 8) | 0x10;
                                 output32bit(0xCF8, adr_bar0);
                                 unsigned int bar0_raw = input32bit(0xCFC);
-                                mmio_base = (volatile unsigned int*)(bar0_raw & 0xFFFFFFF0);
+                                mmio_base = (volatile unsigned int*)(uintptr_t)(bar0_raw & 0xFFFFFFF0);
                                 *this << "BAR0 MMIO Base Address: 0x" << (void*)(uintptr_t)mmio_base << "\n";
                                 Reset(mmio_base);
                                 Clear_Interrupt(mmio_base);
                                 unsigned char mac[6];
-                                Read_MAC(mmio_base);
+                                Read_MAC(mmio_base, mac);
                                 *this << "MAC Address: ";
                                 for(int i = 0; i < 6; i++) {
                                     *this << (unsigned int)mac[i];
@@ -440,22 +440,15 @@ class Screen{
             mmio[0x000D8 / 4] = 0xFFFFFFFF;
             
         }
-        inline void Read_MAC(volatile unsigned int* mmio){
+        inline void Read_MAC(volatile unsigned int* mmio, unsigned char* mac){
             unsigned int mac_low = mmio[0x05400 / 4];
             unsigned int mac_high = mmio[0x05404 / 4];
-            unsigned char mac[6];
             mac[0] = (unsigned char)(mac_low & 0xFF);
             mac[1] = (unsigned char)((mac_low >> 8) & 0xFF);
             mac[2] = (unsigned char)((mac_low >> 16) & 0xFF);
             mac[3] = (unsigned char)((mac_low >> 24) & 0xFF);
             mac[4] = (unsigned char)(mac_high & 0xFF);
             mac[5] = (unsigned char)((mac_high >> 8) & 0xFF);
-            *this << "MAC Address: ";
-            for(int i = 0; i < 6; i++) {
-                *this << (unsigned int)mac[i];
-                if(i < 5) *this << ":";   
-            }    
-            *this << "\n";
         }
 
  static inline  Receive_Descriptor rx_ring[32] __attribute__((aligned(16))); // Im copy and paste this part
@@ -489,8 +482,8 @@ static inline unsigned char tx_buffers[32][2048] __attribute__((aligned(16)));
         mmio[0x03808 / 4] = 32 * sizeof(Transmit_Descriptor);
         mmio[0x03810 / 4] = 0;  
         mmio[0x03818 / 4] = 0; 
-        unsigned int rctl = (1 << 1) | (1 << 3) | (0x3F << 12);
-        mmio[0x00400 / 4] = rctl;
+        unsigned int tctl = (1 << 1) | (1 << 3) | (0x3F << 12);
+        mmio[0x00400 / 4] = tctl;
     }
     inline void send_packet(const unsigned char* data, unsigned short length){
         static int tx = 0; 
