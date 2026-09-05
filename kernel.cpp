@@ -415,6 +415,7 @@ class Screen{
                                 *this << "\n";
                                 Init_RX(mmio_base);
                                 *this << "e1000 RX Engine Initialized successfully!\n";
+                                break;
                             }
                         }
                         if(function == 0){
