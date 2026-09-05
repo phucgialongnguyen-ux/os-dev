@@ -32,7 +32,7 @@ class Screen{
         static inline int curr_pos_limit = 0;
         char curr_color = 0x07;
         volatile char* vga_graphic = (volatile char*)0xA0000;
-
+        inline static volatile unsigned int* mmio_base = nullptr;
         static constexpr unsigned char ASCII_Control_Character_Table[] = {
             0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
             0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11,
@@ -401,7 +401,7 @@ class Screen{
                                 unsigned int adr_bar0 = (1U << 31) | (bus << 16) | (device << 11) | (function << 8) | 0x10;
                                 output32bit(0xCF8, adr_bar0);
                                 unsigned int bar0_raw = input32bit(0xCFC);
-                                volatile unsigned int* mmio_base = (volatile unsigned int*)(bar0_raw & 0xFFFFFFF0);
+                                mmio_base = (volatile unsigned int*)(bar0_raw & 0xFFFFFFF0);
                                 *this << "BAR0 MMIO Base Address: 0x" << (void*)(uintptr_t)mmio_base << "\n";
                                 Reset(mmio_base);
                                 Clear_Interrupt(mmio_base);
@@ -492,7 +492,7 @@ static inline unsigned char tx_buffers[32][2048] __attribute__((aligned(16)));
         unsigned int rctl = (1 << 1) | (1 << 3) | (0x3F << 12);
         mmio[0x00400 / 4] = rctl;
     }
-    inline void send_packet(volatile unsigned int* mmio, const unsigned char* data, unsigned short length){
+    inline void send_packet(const unsigned char* data, unsigned short length){
         static int tx = 0; 
         
         for(int i = 0; i < length; i++){
@@ -502,7 +502,7 @@ static inline unsigned char tx_buffers[32][2048] __attribute__((aligned(16)));
         tx_ring[tx].status = 0;
         tx_ring[tx].cmd = (1 << 0) | (1 << 1) | (1 << 3);
         tx = (tx + 1) % 32;
-        mmio[0x03818 / 4] = tx;
+        mmio_base[0x03818 / 4] = tx;
     }
 };      
 struct __attribute__((packed)) MBRPartitionEntry {
@@ -569,6 +569,8 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     //print << "Write something! \n";
     //print.RestoreColor();
     print.PCI_BUS();
+    print.send_packet(spend_text, sizeof(spend_text));
+    
     constexpr unsigned char cmd_storage[] = {"storage"};
     constexpr unsigned char cmd_help[] = {"help"};
     char cmd_buffer[32];
