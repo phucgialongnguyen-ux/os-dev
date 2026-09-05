@@ -414,6 +414,7 @@ class Screen{
                                 }
                                 *this << "\n";
                                 Init_RX(mmio_base);
+                                Init_TX(mmio_base);
                                 *this << "e1000 RX Engine Initialized successfully!\n";
                                 break;
                             }
@@ -483,6 +484,7 @@ static inline unsigned char tx_buffers[32][2048] __attribute__((aligned(16)));
         mmio[0x03808 / 4] = 32 * sizeof(Transmit_Descriptor);
         mmio[0x03810 / 4] = 0;  
         mmio[0x03818 / 4] = 0; 
+        mmio[0x0410 / 4] = 10 | (8 << 10) | (6 << 20);
         unsigned int tctl = (1 << 1) | (1 << 3) | (0x3F << 12);
         mmio[0x00400 / 4] = tctl;
     }
