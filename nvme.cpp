@@ -1,5 +1,9 @@
 #include "nvme.h"
 
+// Cấp bộ nhớ 4K Byte
+alignas(4096) static NVME_COMMAND static_admin_sq[64];
+alignas(4096) static NVME_COMPLETION static_admin_cq[64];
+
 void NVMeDriver::init(unsigned long long bar0_phys_addr) {
     regs = reinterpret_cast<volatile NVME_CONTROLLER_REGISTERS*>(bar0_phys_addr);
     
@@ -18,6 +22,8 @@ void NVMeDriver::init(unsigned long long bar0_phys_addr) {
 
     // 3. Gán địa chỉ vật lý RAM cho ASQ và ACQ
     // (Trong Kernel thực tế bro cấp phát vùng nhớ RAM 4KB cho admin_sq và admin_cq)
+    admin_sq = static_admin_sq;
+    admin_cq = static_admin_cq;
     regs->asq = reinterpret_cast<unsigned long long>(admin_sq);
     regs->acq = reinterpret_cast<unsigned long long>(admin_cq);
 

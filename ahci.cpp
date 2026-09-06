@@ -45,16 +45,25 @@ bool AHCIDriver::read(HBA_PORT* port, unsigned long long lba, unsigned int count
     int slot = find_cmd_slot(port);
     if (slot == -1) return false;
 
-    auto* cmd_header = reinterpret_cast<HBA_CMD_HEADER*>(port->clb);
+    // Toi cung cha hieu cai ni la cai gi
+    unsigned long long clb_addr = (static_cast<unsigned long long>(port->clbu) << 32) | port->clb;
+    auto* cmd_header = reinterpret_cast<HBA_CMD_HEADER*>(clb_addr);
     cmd_header += slot;
+    
     cmd_header->cfl = sizeof(FIS_REG_H2D) / sizeof(unsigned int);
     cmd_header->w = 0; // 0 = Read
     cmd_header->prdtl = 1;
 
-    auto* cmd_tbl = reinterpret_cast<HBA_CMD_TBL*>(cmd_header->ctba);
-    cmd_tbl->prdt_entry[0].dba = static_cast<unsigned int>(reinterpret_cast<unsigned long long>(buffer));
-    cmd_tbl->prdt_entry[0].dbc = (count * 512) - 1;
-    cmd_tbl->prdt_entry[0].i = 1;
+    // Lấy địa chỉ Command Table
+    unsigned long long ctba_addr = (static_cast<unsigned long long>(cmd_header->ctbau) << 32) | cmd_header->ctba;
+    auto* cmd_tbl = reinterpret_cast<HBA_CMD_TBL*>(ctba_addr);
+
+    // Ép địa chỉ buffer 64-bit thành 2 thanh ghi 32-bit (dba và dbau)
+    unsigned long long buf_addr = reinterpret_cast<unsigned long long>(buffer);
+    cmd_tbl->prdt_entry[0].dba  = static_cast<unsigned int>(buf_addr & 0xFFFFFFFF);
+    cmd_tbl->prdt_entry[0].dbau = static_cast<unsigned int>(buf_addr >> 32);
+    cmd_tbl->prdt_entry[0].dbc  = (count * 512) - 1;
+    cmd_tbl->prdt_entry[0].i    = 1;
 
     auto* fis = reinterpret_cast<FIS_REG_H2D*>(&cmd_tbl->cfis);
     fis->fis_type = 0x27;
@@ -74,13 +83,15 @@ bool AHCIDriver::read(HBA_PORT* port, unsigned long long lba, unsigned int count
 
     port->ci = (1 << slot); // Bắn lệnh
 
-    while (true) {
-        if ((port->ci & (1 << slot)) == 0) break;
+    // Thêm timeout tránh đơ vô tận
+    unsigned int timeout = 10000000;
+    while (timeout--) {
+        if ((port->ci & (1 << slot)) == 0) return true;
         if (port->is & (1 << 30)) return false;
+        asm volatile("pause");
     }
-    return true;
+    return false; // Timeout
 }
-
 // GHI SECTOR
 bool AHCIDriver::write(HBA_PORT* port, unsigned long long lba, unsigned int count, unsigned short* buffer) {
     port->is = 0xFFFF;
