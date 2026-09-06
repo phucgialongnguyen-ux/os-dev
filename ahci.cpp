@@ -26,6 +26,9 @@ PortType AHCIDriver::check_port_type(HBA_PORT* port) {
         default:         return PortType::None;
     }
 }
+HBA_PORT* AHCIDriver::get_port(int index){
+    return (HBA_PORT*)&hba_mem->ports[index];
+}
 
 // ============================================================================
 // HÀM: init
