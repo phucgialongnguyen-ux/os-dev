@@ -523,10 +523,18 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     unsigned int all_sector = entry1->sector_count;
     unsigned int all_storange = all_sector / 2048;
     if (drive_type == 1) {
+        print << "AHCI Drive Detected!\n";
         ahci_driver.init(pci_bar_addr); 
+        alignas(4096) static unsigned int text_read_or_write[1024];
+        unsigned short* to_read_or_to_write = reinterpret_cast<unsigned short*>(text_read_or_write);
+        HBA_PORT* port = ahci_driver.get_port(0);
+        for(int i = 0; i < 10000; i++){bool status_read = ahci_driver.read(port , 100, 8 , to_read_or_to_write);}
+        bool status_write = ahci_driver.write(port , 100, 8 , to_read_or_to_write);
+        
     } 
     else if (drive_type == 2) {
         nvme_driver.init(pci_bar_addr); 
+        
     } 
     else {  
         if (entry1->partition_type != 0) {
@@ -534,7 +542,7 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
             print << "Bootable: ";
             print << "Storage: " << all_storange << " MB\n";
 
-            if (entry1->boot_indicator == 0x80) print << "Yes\n"; else print << "No\n";
+            if (entry1->boot_indicator == 0x80) print << "Yes boot indicator = 0x80!\n"; else print << "Nope boot indicator not 0x80 :(\n";
         } else {
             print.Color(0x0C);
             print << "No Partition Found on Entry 1!\n";
