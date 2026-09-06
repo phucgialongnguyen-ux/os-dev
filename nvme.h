@@ -2,7 +2,7 @@
 #define NVME_H
 
 // Thanh ghi Controller Capabilities (CAP) - 64 bit từ BAR0
-struct NVME_CAP {
+struct __attribute__((packed)) NVME_CAP {
     unsigned short mqes;        // Maximum Queue Entries Supported
     unsigned char  cqr : 1;     // Contiguous Queues Required
     unsigned char  ams : 2;     // Arbitration Mechanism Supported
@@ -20,14 +20,14 @@ struct NVME_CAP {
     unsigned char  rsv2 : 6;
 };
 
-// Cấu trúc thanh ghi NVMe MMIO (Trỏ từ BAR0)
-struct NVME_CONTROLLER_REGISTERS {
+// Cấu trúc thanh ghi NVMe MMIO (Trỏ từ BAR0) - Ép ngắt Padding
+struct __attribute__((packed)) NVME_CONTROLLER_REGISTERS {
     unsigned long long cap;     // Controller Capabilities (0x00)
     unsigned int       vs;      // Version (0x08)
     unsigned int       intms;   // Interrupt Mask Set (0x0C)
     unsigned int       intmc;   // Interrupt Mask Clear (0x10)
     unsigned int       cc;      // Controller Configuration (0x14)
-    unsigned int       rsv0;
+    unsigned int       rsv0;    // Reserved (0x18)
     unsigned int       csts;    // Controller Status (0x1C)
     unsigned int       nssr;    // NVM Subsystem Reset (0x20)
     unsigned int       aqa;     // Admin Queue Attributes (0x24)
@@ -36,33 +36,33 @@ struct NVME_CONTROLLER_REGISTERS {
 };
 
 // Entry trong Submission Queue (64-byte lệnh gửi xuống NVMe)
-struct NVME_COMMAND {
-    unsigned char  opcode;      // Mã lệnh (0x02: Read, 0x01: Write)
-    unsigned char  flags;
-    unsigned short command_id;  // ID để định danh câu lệnh
-    unsigned int   nsid;        // Namespace ID (Thường là 1)
+struct __attribute__((packed)) NVME_COMMAND {
+    unsigned char      opcode;      // Mã lệnh (0x02: Read, 0x01: Write)
+    unsigned char      flags;
+    unsigned short     command_id;  // ID để định danh câu lệnh
+    unsigned int       nsid;        // Namespace ID (Thường là 1)
     unsigned long long rsv0;
-    unsigned long long mptr;    // Metadata Pointer
-    unsigned long long prp1;    // Physical Region Page 1 (Địa chỉ RAM chứa buffer)
-    unsigned long long prp2;    // Physical Region Page 2
+    unsigned long long mptr;        // Metadata Pointer
+    unsigned long long prp1;        // Physical Region Page 1 (Địa chỉ RAM chứa buffer)
+    unsigned long long prp2;        // Physical Region Page 2
     
-    // Command Dwords (Tùy thuộc vào lệnh)
-    unsigned int   cdw10;       // Với Read/Write: LBA Low 32-bit
-    unsigned int   cdw11;       // Với Read/Write: LBA High 32-bit
-    unsigned int   cdw12;       // Với Read/Write: Số lượng Sector (Blocks) - 1
-    unsigned int   cdw13;
-    unsigned int   cdw14;
-    unsigned int   cdw15;
+    // Command Dwords
+    unsigned int       cdw10;       // LBA Low 32-bit
+    unsigned int       cdw11;       // LBA High 32-bit
+    unsigned int       cdw12;       // Số lượng Sector (Blocks) - 1
+    unsigned int       cdw13;
+    unsigned int       cdw14;
+    unsigned int       cdw15;
 };
 
 // Entry trong Completion Queue (16-byte phản hồi từ NVMe)
-struct NVME_COMPLETION {
-    unsigned int   command_specific;
-    unsigned int   rsv0;
-    unsigned short sq_head;    // Con trỏ Head của SQ
-    unsigned short sq_id;      // ID của SQ
-    unsigned short command_id; // ID lệnh khớp với NVME_COMMAND
-    unsigned short status;     // Bit 0 = Phase Tag, Bit 1-15 = Mã lỗi/Trạng thái
+struct __attribute__((packed)) NVME_COMPLETION {
+    unsigned int       command_specific;
+    unsigned int       rsv0;
+    unsigned short     sq_head;    // Con trỏ Head của SQ
+    unsigned short     sq_id;      // ID của SQ
+    unsigned short     command_id; // ID lệnh khớp với NVME_COMMAND
+    unsigned short     status;     // Status Field
 };
 
 class NVMeDriver {
@@ -83,4 +83,4 @@ private:
     unsigned short admin_cq_head = 0;
 };
 
-#endif
+#endif // NVME_H

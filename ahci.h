@@ -10,7 +10,7 @@ enum class PortType {
 };
 
 // Cấu trúc PRDT - Quản lý vùng nhớ DMA
-struct HBA_PRDT_ENTRY {
+struct __attribute__((packed)) HBA_PRDT_ENTRY {
     unsigned int dba;       // Địa chỉ vật lý 32-bit thấp
     unsigned int dbau;      // Địa chỉ vật lý 32-bit cao
     unsigned int rsv0;
@@ -20,7 +20,7 @@ struct HBA_PRDT_ENTRY {
 };
 
 // Command Table chứa Command FIS và PRDT
-struct HBA_CMD_TBL {
+struct __attribute__((packed)) HBA_CMD_TBL {
     unsigned char cfis[64];
     unsigned char acmd[16];
     unsigned char rsv[48];
@@ -28,7 +28,7 @@ struct HBA_CMD_TBL {
 };
 
 // Command Header đại diện 1 câu lệnh trong Command List
-struct HBA_CMD_HEADER {
+struct __attribute__((packed)) HBA_CMD_HEADER {
     unsigned char cfl : 5;   // Độ dài FIS
     unsigned char a : 1;
     unsigned char w : 1;     // 1: Ghi, 0: Đọc
@@ -46,7 +46,7 @@ struct HBA_CMD_HEADER {
 };
 
 // Thanh ghi của 1 Port AHCI
-struct HBA_PORT {
+struct __attribute__((packed)) HBA_PORT {
     unsigned int clb;       // Command List Base Low
     unsigned int clbu;      // Command List Base High
     unsigned int fb;        // FIS Base Low
@@ -69,7 +69,7 @@ struct HBA_PORT {
 };
 
 // Cấu trúc MMIO tổng của AHCI Controller (BAR5)
-struct HBA_MEM {
+struct __attribute__((packed)) HBA_MEM {
     unsigned int cap;       // Host Capabilities
     unsigned int ghc;       // Global Host Control (Bật AHCI Enable)
     unsigned int is;
@@ -87,7 +87,7 @@ struct HBA_MEM {
 };
 
 // FIS Register H2D (Host to Device) gửi lệnh đến đĩa
-struct FIS_REG_H2D {
+struct __attribute__((packed)) FIS_REG_H2D {
     unsigned char fis_type; // 0x27
     unsigned char pmport : 4;
     unsigned char rsv0 : 3;
@@ -121,4 +121,4 @@ private:
     int find_cmd_slot(HBA_PORT* port);
 };
 
-#endif
+#endif // AHCI_H
