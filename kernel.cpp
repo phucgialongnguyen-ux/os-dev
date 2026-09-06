@@ -528,7 +528,7 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
         alignas(4096) static unsigned int text_read_or_write[1024];
         unsigned short* to_read_or_to_write = reinterpret_cast<unsigned short*>(text_read_or_write);
         HBA_PORT* port = ahci_driver.get_port(0);
-        for(int i = 0; i < 10000; i++){bool status_read = ahci_driver.read(port , 100, 8 , to_read_or_to_write);}
+        for(volatile int i = 0; i < 1000000; i++){bool status_read = ahci_driver.read(port , 100, 8 , to_read_or_to_write);}
         bool status_write = ahci_driver.write(port , 100, 8 , to_read_or_to_write);
         
     } 
