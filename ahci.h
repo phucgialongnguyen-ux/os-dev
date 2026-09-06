@@ -112,7 +112,7 @@ struct __attribute__((packed)) FIS_REG_H2D {
 class AHCIDriver {
 public:
     void init(unsigned long long bar5_phys_addr);
-    HBA_PORT* AHCIDriver::get_port(int index){return (HBA_PORT*)&hba_mem->ports[index];}
+    HBA_PORT* get_port(int index){return (HBA_PORT*)&hba_mem->ports[index];}
     bool read(HBA_PORT* port, unsigned long long lba, unsigned int count, unsigned short* buffer);
     bool write(HBA_PORT* port, unsigned long long lba, unsigned int count, unsigned short* buffer);
 
