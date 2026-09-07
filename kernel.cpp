@@ -189,7 +189,22 @@ class Screen{
                         }
                     }
                 }
-
+                if(curr_pos >= 4000){
+                    for(int i = 0 ; i < 3840; i++){
+                        vga_display[i] = vga_display[i + 160];
+                    }
+                    for(int i = 3840 ; i << 4000; i++){
+                        vga_display[i] = ' ';
+                        vga_display[i + 1] = 0x07;
+                    }
+                    curr_pos -= 160;
+                    if(curr_pos_limit >= 160){
+                        curr_pos_limit -= 160;
+                    }
+                    else{
+                        curr_pos_limit = 0;
+                    }
+                }
                 vga_display[curr_pos] = text[i];
                 vga_display[curr_pos + 1] = curr_color;
                 curr_pos += 2;
@@ -317,7 +332,7 @@ class Screen{
                 // this too
                 if(Scancode == 0x48){}        // LÊN, khong con len duoc :)
                 else if(Scancode == 0x50){} // XUỐNG, Khong con xuong duoc :)
-                else if(Scancode == 0x4B){ if(curr_pos >= 2) curr_pos -= 2; }         // TRÁI
+                else if(Scancode == 0x4B){ if(curr_pos > curr_pos_limit &&curr_pos >= 2) curr_pos -= 2; }         // TRÁI
                 else if(Scancode == 0x4D){ if(curr_pos + 2 < 4000) curr_pos += 2; }     // PHẢI
 
                 UpdateCursor(); 
