@@ -582,8 +582,32 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
         if(text != 0){
             if(text == '\n'){
                 print << "\n";
+                cmd_buffer[buffer_index] == '\0'; //gotta go fast at this part so yeah,
+                if(buffer_index != 0){
+                    bool cmd_storage_is = true;
+                    for(int i = 0; i < 7; i++){
+                        if(cmd_buffer[i] != cmd_storage[i]){
+                            cmd_storage_is = false;
+                            break;
+                        }
+                    }
+                    bool cmd_help_is = true;
+                    for(int i = 0; i < 5; i++){
+                        if(cmd_buffer[i] != cmd_storage[i]){
+                            cmd_help_is = false;
+                            break;
+                        }
+                    }
+                    if(cmd_storage_is){
+                        print << "Storage Info: " << all_storange << "n";
+                    }
+                    if(cmd_help_is){
+                        print.CleanUp();
+                    }
+                }//i'll view some repo on github or smt
+                
                 print.SomethingBeatifull(); //Sorry but no more 
-            }  // char str[2] = {text, '\0'}; :( rip
+            }                               // char str[2] = {text, '\0'}; :( rip
             else{
                 print << text;
             } 
