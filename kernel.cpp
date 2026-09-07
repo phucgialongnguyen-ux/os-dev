@@ -193,7 +193,7 @@ class Screen{
                     for(int i = 0 ; i < 3840; i++){
                         vga_display[i] = vga_display[i + 160];
                     }
-                    for(int i = 3840 ; i << 4000; i++){
+                    for(int i = 3840 ; i < 4000; i++){
                         vga_display[i] = ' ';
                         vga_display[i + 1] = 0x07;
                     }
@@ -590,7 +590,8 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     constexpr unsigned char cmd_help[] = {"help"};
     char cmd_buffer[32];
     int buffer_index = 0;// maybe.. in the future, i'll make 100 cmd
-
+    bool is_storage = true;
+    bool is_clear = true;
     Screen::UpdateCursor();
     while(1){
         char text = Screen::Keyboard_Driver();
@@ -598,25 +599,25 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
             if(text == '\n'){
                 print << "\n";
                 cmd_buffer[buffer_index] = '\0'; //gotta go fast at this part so yeah,
-                if(buffer_index != 0){
-                    bool cmd_storage_is = true;
+                if(buffer_index != 0){  
                     for(int i = 0; i < 7; i++){
                         if(cmd_buffer[i] != cmd_storage[i]){
-                            cmd_storage_is = false;
+                            is_storage = false;
                             break;
                         }
                     }
-                    bool cmd_storage_is = true;
+                    
+
                     for(int i = 0; i < 5; i++){
                         if(cmd_buffer[i] != cmd_storage[i]){
-                            cmd_storage_is = false;
+                            is_clear = false;
                             break;
                         }
                     }
-                    if(cmd_storage_is){
+                    if(is_storage){
                         print << "Storage Info: " << all_storange << "n";
                     }
-                    if(cmd_storage_is){
+                    if(is_clear){
                         print.CleanUp();
                     }
                 }//i'll view some repo on github or smt
