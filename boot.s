@@ -23,8 +23,9 @@ stack_top:
 
 _start:
 	mov $stack_top, %esp
+	push $1
+	push $0xFEBF0000
 	call kernel_main   /* Gọi hàm kernel_main bên kernel.cpp */
-
 	cli
 1:	hlt
 	jmp 1b
