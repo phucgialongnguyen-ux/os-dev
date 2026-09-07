@@ -174,7 +174,7 @@ class Screen{
         };
 
         inline Screen& operator<<(const char* text){
-            for(int i = 0 ; text[i] != '\0'; i++ ){
+            for(int i = 0 ; text[i] != '\0'; i++){
                 if(text[i] == '\n' ){
                     curr_pos = (curr_pos / 160 + 1) * 160;
                     continue;
@@ -193,7 +193,7 @@ class Screen{
                     for(int i = 0 ; i < 3840; i+=2){
                         vga_display[i] = vga_display[i + 160];
                     }
-                    for(int i = 3840 ; i < 4000; i++){
+                    for(int i = 3840 ; i < 4000; i+=2){
                         vga_display[i] = ' ';
                         vga_display[i + 1] = 0x07;
                     }
