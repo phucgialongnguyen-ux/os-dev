@@ -523,16 +523,12 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     unsigned int all_sector = entry1->sector_count;
     unsigned int all_storange = all_sector / 2048;
     if (drive_type == 1) {
-        print << "AHCI Drive Detected!\n";
-        ahci_driver.init(pci_bar_addr); 
-        alignas(4096) static unsigned int text_read_or_write[1024];
-        unsigned short* to_read_or_to_write = reinterpret_cast<unsigned short*>(text_read_or_write);
-        HBA_PORT* port = ahci_driver.get_port(0);
-        for(volatile int i = 0; i < 1000000; i++){bool status_read = ahci_driver.read(port , 100, 8 , to_read_or_to_write);}
-        bool status_write = ahci_driver.write(port , 100, 8 , to_read_or_to_write);
+        print << "AHCI Driver Detected!\n";
+        ahci_driver.init(pci_bar_addr);   
         
     } 
     else if (drive_type == 2) {
+        print << "NVme Driver Detected! \n";
         nvme_driver.init(pci_bar_addr); 
         
     } 
