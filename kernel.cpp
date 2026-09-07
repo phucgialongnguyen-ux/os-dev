@@ -190,7 +190,7 @@ class Screen{
                     }
                 }
                 if(curr_pos >= 4000){
-                    for(int i = 0 ; i < 3840; i++){
+                    for(int i = 0 ; i < 3840; i+=2){
                         vga_display[i] = vga_display[i + 160];
                     }
                     for(int i = 3840 ; i < 4000; i++){
@@ -606,8 +606,6 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
                             break;
                         }
                     }
-                    
-
                     for(int i = 0; i < 5; i++){
                         if(cmd_buffer[i] != cmd_storage[i]){
                             is_clear = false;
@@ -624,11 +622,6 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
                 
                 print.SomethingBeatifull(); //Sorry but no more 
             }                               // char str[2] = {text, '\0'}; :( rip
-            else if(text == '\b'){
-                if(buffer_index > 0){
-                    buffer_index--;
-                }
-            }
             else{
                 if(buffer_index < 31){
                     cmd_buffer[buffer_index];
