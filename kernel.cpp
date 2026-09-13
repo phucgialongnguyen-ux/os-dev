@@ -467,7 +467,6 @@ class Screen{
             mac[4] = (unsigned char)(mac_high & 0xFF);
             mac[5] = (unsigned char)((mac_high >> 8) & 0xFF);
         }
-
  static inline  Receive_Descriptor rx_ring[32] __attribute__((aligned(16))); // Im copy and paste this part
  static inline unsigned char rx_buffers[32][2048] __attribute__((aligned(16))); // this too
 
@@ -524,6 +523,7 @@ struct __attribute__((packed)) MBRPartitionEntry {
     unsigned int   start_lba;     
     unsigned int   sector_count;    
 };
+
 AHCIDriver ahci_driver;
 NVMeDriver nvme_driver;
 extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
