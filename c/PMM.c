@@ -17,6 +17,7 @@ void Memory_Allocation(struct PMA* pma){
             unsigned long long* bitmap = pma->memory_bit;
             if(((bitmap[index]) & (1ULL << i)) == 0){
                 //Comming Soon, I HATE School :(
+                
             }        
         }    
     }
