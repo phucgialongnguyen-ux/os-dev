@@ -5,7 +5,7 @@ typedef struct Header {
     int is_free;
     struct Header* next;
 } Header;
-_Alignas(4096) static unsigned char heap[65536];
+_Alignas(4096) static unsigned char heap[524288];
 static Header* head = NULL;
 void init_heap(void) {
     head = (Header*)heap;
