@@ -5,8 +5,8 @@
 #ifdef __c
 extern "C"{
     #endif
-    void* plz(size_tz size){}
-    void thanks(){}
+    void* plz(size_tz size);
+    void thanks(void* ptr);
     #ifdef __c
 }
 #endif
