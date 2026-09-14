@@ -12,7 +12,9 @@ struct PMA{
 };
 void Memory_Allocation(struct PMA* pma){
     unsigned long long index = 0;
-    for(unsigned long long i = 0; i < 100; i++){
+    unsigned int buddy_index = 0;
+    unsigned int* last_Allocated_Buddy_Bit;
+    for(unsigned long long i = 0; i < 64; i++){
         if(((pma->memory_bit[index]) & (1ULL << i)) == 0){
             pma->memory_bit[index] |= (1ULL << i); 
             *(pma->last_Allocated_Bit) += 1;
@@ -27,5 +29,12 @@ void Memory_Allocation(struct PMA* pma){
                 }
             }        
         }    
+    }
+    for(unsigned long long i = 0 ; i < 64; i++){
+        if(((pma->buddy[buddy_index]) & (1U << i)) == 0){
+            pma->buddy[buddy_index] |= (1U << i);
+            *last_Allocated_Buddy_Bit += 1;
+            break;
+        }
     }
 }
