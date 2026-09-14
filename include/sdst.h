@@ -2,12 +2,12 @@
 #define SDST_H
 
 #include "size_t.h"
-#ifdef __c
+#ifdef __cplusplus
 extern "C"{
     #endif
     void* plz(size_tz size);
     void thanks(void* ptr);
-    #ifdef __c
+    #ifdef __cplusplus
 }
 #endif
 
