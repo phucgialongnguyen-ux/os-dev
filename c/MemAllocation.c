@@ -34,7 +34,14 @@ void Memory_Allocation(struct PMA* pma){
         if(((pma->buddy[buddy_index]) & (1ULL << i)) == 0){
             pma->buddy[buddy_index] |= (1ULL << i);
             *(pma->last_Allocated_Buddy_Bit) += 1;
-            break;
+            unsigned long long physc_addr = (buddy_index * 64 + i) * 4096;
+            unsigned long long Present = 0;
+            Present |= (1ULL << 0);
+            unsigned long long Read_Write = 0;
+            Read_Write |= (1ULL << 1);
+            unsigned long long User_Supervisor = 0;
+            User_Supervisor |= (1ULL << 2);
+            return physc_addr;
         }
     }
 }
