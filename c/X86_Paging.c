@@ -19,13 +19,13 @@ void Page_Directory(unsigned int phys_addr){
     unsigned int RorW;
     unsigned int P = 0;
     unsigned int entry = device 
-                        | (AVL  << 8) 
+                        | (AVL  << 9) 
                         | (PS   << 7) 
-                        | (AVL  << 6) 
                         | (A    << 5)
                         | (PCD  << 4)
                         | (PWT  << 3)
                         | (UorS << 2)
                         | (RorW << 1)
                         | (P    << 0);
+    
 }
