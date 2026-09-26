@@ -6,7 +6,7 @@ typedef struct Header {
     struct Header* next;
 } Header;
 _Alignas(4096) static unsigned char heap[524288];
-static Header* head = NULL;
+Header* head = NULL;
 void init_heap(void) {
     head = (Header*)heap;
     head->size = sizeof(heap) - sizeof(Header);
@@ -16,7 +16,7 @@ void init_heap(void) {
 void* plz(size_tz size) {
     if (!head) init_heap();
     if (size == 0) return NULL;
-    size = (size + 7) & ~((size_tz)7);
+    size = (size + 7) & ~((size_tz)0x07);
     Header* curr = head;
     while (curr) {
         if (curr->is_free && curr->size >= size) {

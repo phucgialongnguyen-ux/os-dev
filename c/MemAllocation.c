@@ -7,41 +7,31 @@
 
 struct PMA{
     unsigned long long* memory_bit;
-    unsigned long long* last_Allocated_Bit;
+    unsigned long long last_Allocated_Bit;
     unsigned long long* buddy;
-    unsigned long long* last_Allocated_Buddy_Bit;
+    unsigned long long last_Allocated_Buddy_Bit;
 };
-void Memory_Allocation(struct PMA* pma){
+
+unsigned long long Memory_Allocation(struct PMA* pma){
+    if(pma == NULL || pma->memory_bit == NULL || pma->buddy == NULL){
+        return 0;
+    }
+
     unsigned long long index = 0;
     unsigned long long buddy_index = 0;
+
     for(size_tz i = 0; i < 64; i++){
-        if(((pma->memory_bit[index]) & (1ULL << i)) == 0){
+        if(((pma->memory_bit[index]) & (1ULL << i)) == 0 && ((pma->buddy[buddy_index]) & (1ULL << i)) == 0){
             pma->memory_bit[index] |= (1ULL << i); 
-            *(pma->last_Allocated_Bit) += 1;
-            break;
-        }
-        else if(((pma->memory_bit[index]) & (1ULL << i)) != 0){
-            unsigned long long* bitmap = pma->memory_bit;
-            if(((bitmap[index]) & (1ULL << i)) == 0){
-                unsigned long long* heap = (unsigned long long*)plz(4096);
-                if(heap == NULL){
-                    return;
-                }
-            }        
-        }    
-    }
-    for(size_tz i = 0 ; i < 64; i++){
-        if(((pma->buddy[buddy_index]) & (1ULL << i)) == 0){
             pma->buddy[buddy_index] |= (1ULL << i);
-            *(pma->last_Allocated_Buddy_Bit) += 1;
+
+            pma->last_Allocated_Bit += 1;
+            pma->last_Allocated_Buddy_Bit += 1;
+
             unsigned long long physc_addr = (buddy_index * 64 + i) * 4096;
-            unsigned long long Present = 0;
-            Present |= (1ULL << 0);
-            unsigned long long Read_Write = 0;
-            Read_Write |= (1ULL << 1);
-            unsigned long long User_Supervisor = 0;
-            User_Supervisor |= (1ULL << 2);
             return physc_addr;
         }
     }
+
+    return 0;
 }

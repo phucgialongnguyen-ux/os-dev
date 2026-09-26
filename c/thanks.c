@@ -13,6 +13,7 @@ void thanks(void* ptr) {
     if (!ptr) return;
     Header* header = ((Header*)ptr) - 1;
     header->is_free = 1;
+    
     Header* curr = head;
     while (curr && curr->next) {
         if (curr->is_free && curr->next->is_free) {

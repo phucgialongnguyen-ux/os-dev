@@ -28,4 +28,5 @@ void Page_Directory(unsigned int phys_addr){
                         | (RorW << 1)
                         | (P    << 0);
     
+    
 }
