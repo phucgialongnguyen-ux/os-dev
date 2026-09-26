@@ -30,3 +30,32 @@ void Page_Directory(unsigned int phys_addr){
     
     
 }
+
+_Alignas(4096) struct Page_Table{
+    unsigned int page_table_Entries[1024];
+};
+
+void PTE(unsigned int phys_addr){
+    unsigned int device = phys_addr & 0xFFFFF000;
+    unsigned int AVL;
+    unsigned int G;
+    unsigned int PAT;
+    unsigned int D;
+    unsigned int A;
+    unsigned int PCD;
+    unsigned int PWT;
+    unsigned int UorS;
+    unsigned int RorW;
+    unsigned int P;
+    unsigned int entry = device
+                        | (AVL << 9)
+                        | (G << 8)
+                        | (PAT << 7)
+                        | (D << 6)
+                        | (A << 5)
+                        | (PCD << 4)
+                        | (PWT << 3)
+                        | (UorS << 2)
+                        | (RorW << 1)
+                        | (P << 0);
+}
