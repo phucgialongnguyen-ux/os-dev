@@ -1,3 +1,5 @@
+//#soucre https://wiki.osdev.org/X86_Paging#32-bit_Paging_(Protected_Mode)
+
 #include "sdst.h"
 #include "size_t.h"
 
