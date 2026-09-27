@@ -8,6 +8,7 @@ _Alignas(4096) struct paging32bit{
     unsigned int page_directory_Entries[1024];
 };
 
+//Hàm tạo PDE 4KB
 void Page_Directory(unsigned int phys_addr){
     unsigned int device = phys_addr & 0xFFFFF000;
     unsigned int AVL;
