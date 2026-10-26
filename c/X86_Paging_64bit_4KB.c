@@ -67,5 +67,30 @@ void map_page(struct Paging64Bit4KB *pml4,unsigned long long virtual_addr,unsign
     pt->entries[PT_idx] = (phys_addr & 0x000FFFFFFFFFF000ULL) | flags | 1;
 }
 
+void unmap_page(struct Paging64Bit4KB *pml4, unsigned long long virtual_addr){
+    unsigned long long PML4_idx = virtual_addr;
+    PML4_idx = (PML4_idx >> 39) & 0x1FF;
+    unsigned long long PDPT_idx = virtual_addr;
+    PDPT_idx = (PDPT_idx >> 30) & 0x1FF;
+    unsigned long long PD_idx = virtual_addr;
+    PD_idx = (PD_idx >> 21) & 0x1FF;
+    unsigned long long PT_idx = virtual_addr;
+    PT_idx = (PT_idx >> 12) & 0x1FF;
+    unsigned long long Page_offset_idx = virtual_addr;
+    Page_offset_idx = Page_offset_idx & 0xFFF; 
+
+    if(!(pml4->entries[PDPT_idx] & 1)) return 0;
+    struct Paging64Bit4KB *pdpt = (struct Paging64Bit4KB *)(pml4->entries[PML4_idx] & 0x000FFFFFFFFFF000ULL);
+    
+    if (!(pdpt->entries[PDPT_idx] & 1)) return;
+    struct Paging64Bit4KB *pd = (struct Paging64Bit4KB *)(pdpt->entries[PDPT_idx] & 0x000FFFFFFFFFF000ULL);
+
+    if (!(pd->entries[PD_idx] & 1)) return;
+    struct Paging64Bit4KB *pt = (struct Paging64Bit4KB *)(pd->entries[PD_idx] & 0x000FFFFFFFFFF000ULL);
+
+    pt->entries[PT_idx] = 0;
+
+    __asm__ volatile("invlpg (%0)" : : "r" (virtual_addr) : "memory");
+}
 //maybe i'll finish this one tomorrow, or longer(next week)
 //i hate school so much!
