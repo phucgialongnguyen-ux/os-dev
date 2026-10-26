@@ -79,7 +79,7 @@ void unmap_page(struct Paging64Bit4KB *pml4, unsigned long long virtual_addr){
     unsigned long long Page_offset_idx = virtual_addr;
     Page_offset_idx = Page_offset_idx & 0xFFF; 
 
-    if(!(pml4->entries[PDPT_idx] & 1)) return 0;
+    if(!(pml4->entries[PDPT_idx] & 1)) return;
     struct Paging64Bit4KB *pdpt = (struct Paging64Bit4KB *)(pml4->entries[PML4_idx] & 0x000FFFFFFFFFF000ULL);
     
     if (!(pdpt->entries[PDPT_idx] & 1)) return;
