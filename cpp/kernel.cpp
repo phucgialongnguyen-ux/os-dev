@@ -350,14 +350,14 @@ class Screen{
         }
         void SomethingBeatifull(){
             Color(0x0B);
-            *this << "yoursOS ";
+            *this << "@user-ux ";
             Color(0x07);
-            *this << "user ";
+            *this << "-> ";
             Color(0x0D);
-            *this << "- ";
+            *this << "/workspace/ ";
             Color(0x0A);
             *this << "$ ";
-            RestoreColor();
+            //RestoreColor();
             curr_pos_limit = curr_pos;
 
         }
@@ -613,7 +613,7 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
                         }
                     }
                     if(is_storage){
-                        print << "Storage Info: " << all_storange << "n";
+                        print << "Storage Info: " << all_storange << "\n";
                     }
                     if(is_clear){
                         print.CleanUp();
@@ -625,7 +625,7 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
             else{
                 if(buffer_index < 31){
                     cmd_buffer[buffer_index];
-                    print << text;
+                    buffer_index++;
                 }
             } 
         }
