@@ -1,5 +1,8 @@
 #include "ahci.h"
 #include "nvme.h"
+#include "sdst.h"
+#include "size_t.h"
+
 typedef unsigned int uintptr_t;
 __attribute__((section(".multiboot"))) const unsigned int boot_checksum[]{
         0x1BADB002,
