@@ -593,47 +593,48 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
         char text = Screen::Keyboard_Driver();
         if(text != 0){
             if (text == '\n') {
-    print << "\n";
-    cmd_buffer[buffer_index] = '\0';
+                print << "\n";
+               cmd_buffer[buffer_index] = '\0';
 
-    if (buffer_index == 7) {
-        bool is_storage = true;
-        for (int i = 0; i < 7; i++) {
-            if (cmd_buffer[i] != cmd_storage[i]) {
-                is_storage = false;
-                break;
-            }
-        }
-        if (is_storage) {
-            print << "Storage Info: " << all_storange << " MB\n";
-        }
-    }
-
-    if (buffer_index == 5) {
-        bool is_clear = true;
-            for (int i = 0; i < 5; i++) {
-                if (cmd_buffer[i] != cmd_clear[i]) {
-                    is_clear = false;
+        if (buffer_index == 7) {
+            bool is_storage = true;
+            for (int i = 0; i < 7; i++) {
+                if (cmd_buffer[i] != cmd_storage[i]) {
+                    is_storage = false;
                     break;
                 }
             }
-            if (is_clear) {
-                print.CleanUp();
+            if (is_storage) {
+                print << "Storage Info: " << all_storange << " MB\n";
             }
         }
 
-        buffer_index = 0;
-        print.SomethingBeatifull();
-    } else if (text == '\b') {
-        if (buffer_index > 0) {
-              buffer_index--;
-              print << '\b';
-            }   
-        } else {
-            if (buffer_index < 31 && text >= 32 && text < 127) {
-                cmd_buffer[buffer_index] = text;
-                buffer_index++;
-                print << text;
+        if (buffer_index == 5) {
+            bool is_clear = true;
+                for (int i = 0; i < 5; i++) {
+                    if (cmd_buffer[i] != cmd_clear[i]) {
+                     is_clear = false;
+                        break;
+                    }
+             }
+                if (is_clear) {
+                    print.CleanUp();
+                }
+            }
+
+            buffer_index = 0;
+            print.SomethingBeatifull();
+        } else if (text == '\b') {
+            if (buffer_index > 0) {
+                buffer_index--;
+                  print << '\b';
+             }   
+            } else {
+                if (buffer_index < 31 && text >= 32 && text < 127) {
+                    cmd_buffer[buffer_index] = text;
+                    buffer_index++;
+                    print << text;
+                }
             }
         }
     }
