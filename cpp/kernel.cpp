@@ -577,15 +577,7 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
 
     };
     Screen::SysSpeaker(1000); // i tried this on virtualbox but i don't heard anything 
-    for(volatile int i = 0; i < 200000; i++){} 
     Screen::SysSpeakerStop();
-    //print.Color(0x0A);
-    //print << "Hello World!!!!!! \n";
-    //print.RestoreColor();
-    //rest in peace my friends "hello world", i won't forget you!! i promise.
-    //print.Color(0x0A);
-    //print << "Write something! \n";
-    //print.RestoreColor();
     print.PCI_BUS();
     print.send_packet(spend_text, sizeof(spend_text));
     
