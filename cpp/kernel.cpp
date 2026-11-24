@@ -601,36 +601,36 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
         if(text != 0){
             if(text == '\n'){
                 print << "\n";
-                //cmd_buffer[buffer_index] = '\0'; //gotta go fast at this part so yeah,i'll copy and paste
-                //if(buffer_index != 0){  
-                //    for(int i = 0; i < 7; i++){
-                  //      if(cmd_buffer[i] != cmd_storage[i]){
-                   //         is_storage = false;
-                    //        break;
-                   //     }
-                 //   }
-                 //   for(int i = 0; i < 5; i++){
-                    //    if(cmd_buffer[i] != cmd_storage[i]){
-                    //        is_clear = false;
-                      //      break;
-                      //  }
-                  //  }
-                 //   if(is_storage){
-                  //      print << "Storage Info: " << all_storange << "\n";
-                 //   }
-                 //   if(is_clear){
-                   //     print.CleanUp();
-                 //   }
-              //  }//i'll view some repo on github or smt
+                cmd_buffer[buffer_index] = '\0'; //gotta go fast at this part so yeah,i'll copy and paste
+                if(buffer_index != 0){  
+                    for(int i = 0; i < 7; i++){
+                        if(cmd_buffer[i] != cmd_storage[i]){
+                            is_storage = false;
+                            break;
+                        }
+                    }
+                    for(int i = 0; i < 5; i++){
+                        if(cmd_buffer[i] != cmd_storage[i]){
+                            is_clear = false;
+                            break;
+                        }
+                    }
+                    if(is_storage){
+                        print << "Storage Info: " << all_storange << "\n";
+                    }
+                    if(is_clear){
+                        print.CleanUp();
+                    }
+                }//i'll view some repo on github or smt
                 
-               // print.SomethingBeatifull(); //Sorry but no more 
-           // }                               // char str[2] = {text, '\0'}; :( rip
-           // else{
-               // if(buffer_index < 31){
-                  //  cmd_buffer[buffer_index];
-               //     buffer_index++;
-               // }
-            }
+                print.SomethingBeatifull(); //Sorry but no more 
+            }                               // char str[2] = {text, '\0'}; :( rip
+            else{
+                if(buffer_index < 31){
+                    cmd_buffer[buffer_index];
+                    buffer_index++;
+                }
+            } 
         }
     }
 }
