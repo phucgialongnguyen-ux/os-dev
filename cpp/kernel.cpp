@@ -593,7 +593,7 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
         char text = Screen::Keyboard_Driver();
         if(text != 0){
             if(text == '\n'){
-                print << "\n";
+                print << '\n';     
                 cmd_buffer[buffer_index] = '\0';
                 if(buffer_index != 0){
                     bool is_storage = true;
