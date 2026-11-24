@@ -576,25 +576,29 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
         'H', 'e', 'l', 'l', 'o', ' ', 'f', 'r', 'o', 'm', ' ', 'y', 'o', 'u', 'r', 'O', 'S', '!', '\n'
 
     };
-    Screen::SysSpeaker(1000); // i tried this on virtualbox but i don't heard anything 
+    Screen::SysSpeaker(1000); // i tried this on virtualbox but i don't heard anything
+    for(volatile int i = 0; i <= 2000000; i++); 
     Screen::SysSpeakerStop();
     print.PCI_BUS();
     print.send_packet(spend_text, sizeof(spend_text));
     
     constexpr unsigned char cmd_storage[] = {"storage"};
+    constexpr unsigned char cmd_clear[] = {"clear"};
     constexpr unsigned char cmd_help[] = {"help"};
     char cmd_buffer[32];
-    int buffer_index = 0;// maybe.. in the future, i'll make 100 cmd
-    bool is_storage = true;
-    bool is_clear = true;
+    int buffer_index = 0;
+
     Screen::UpdateCursor();
     while(1){
         char text = Screen::Keyboard_Driver();
         if(text != 0){
             if(text == '\n'){
                 print << "\n";
-                cmd_buffer[buffer_index] = '\0'; //gotta go fast at this part so yeah,i'll copy and paste
-                if(buffer_index != 0){  
+                cmd_buffer[buffer_index] = '\0';
+                if(buffer_index != 0){
+                    bool is_storage = true;
+                    bool is_clear = true;
+
                     for(int i = 0; i < 7; i++){
                         if(cmd_buffer[i] != cmd_storage[i]){
                             is_storage = false;
@@ -602,27 +606,28 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
                         }
                     }
                     for(int i = 0; i < 5; i++){
-                        if(cmd_buffer[i] != cmd_storage[i]){
+                        if(cmd_buffer[i] != cmd_clear[i]){
                             is_clear = false;
                             break;
                         }
                     }
+
                     if(is_storage){
-                        print << "Storage Info: " << all_storange << "\n";
+                        print << "Storage Info: " << all_storange << " MB\n";
                     }
                     if(is_clear){
                         print.CleanUp();
                     }
-                }//i'll view some repo on github or smt
-                
-                print.SomethingBeatifull(); //Sorry but no more 
-            }                               // char str[2] = {text, '\0'}; :( rip
+                }
+                buffer_index = 0;
+                print.SomethingBeatifull();
+            }
             else{
                 if(buffer_index < 31){
-                    cmd_buffer[buffer_index];
+                    cmd_buffer[buffer_index] = text;
                     buffer_index++;
+                    print << text;
                 }
-            } 
+            }
         }
     }
-}
