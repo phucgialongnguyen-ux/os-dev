@@ -631,3 +631,4 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
             }
         }
     }
+}
