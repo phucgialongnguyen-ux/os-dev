@@ -11,28 +11,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Install Toolchain and GRUB
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc-multilib g++-multilib grub-pc-bin grub-common xorriso mtools dosfstools
+      - name: Install Toolchain and GRUB
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-multilib g++-multilib grub-pc-bin grub-common xorriso mtools dosfstools
 
-    - name: Compile Kernel and Create ISO
-      run: |
-        as --32 boot.s -o boot.o
-        g++ -m32 -c kernel.cpp -o kernel.o -ffreestanding -fno-rtti -fno-exceptions -fno-use-cxa-atexit -fno-builtin
-        g++ -m32 -c ahci.cpp -o ahci.o -ffreestanding -fno-rtti -fno-exceptions -fno-use-cxa-atexit -fno-builtin
-        g++ -m32 -c nvme.cpp -o nvme.o -ffreestanding -fno-rtti -fno-exceptions -fno-use-cxa-atexit -fno-builtin
-        ld -m elf_i386 -z noexecstack -T linker.ld -o yoursOS.bin boot.o kernel.o ahci.o nvme.o
-        mkdir -p isodir/boot/grub
-        cp yoursOS.bin isodir/boot/yoursOS.bin
-        cp grub.cfg isodir/boot/grub/grub.cfg
-        grub-mkrescue -o yoursOS.iso isodir
+      - name: Compile Kernel and Create ISO
+        run: |
+          as --32 boot.s -o boot.o
+          g++ -m32 -c cpp/kernel.cpp -o kernel.o -Iinclude -ffreestanding -fno-rtti -fno-exceptions -fno-use-cxa-atexit -fno-builtin
+          g++ -m32 -c cpp/ahci.cpp -o ahci.o -Iinclude -ffreestanding -fno-rtti -fno-exceptions -fno-use-cxa-atexit -fno-builtin
+          g++ -m32 -c cpp/nvme.cpp -o nvme.o -Iinclude -ffreestanding -fno-rtti -fno-exceptions -fno-use-cxa-atexit -fno-builtin
+          ld -m elf_i386 -z noexecstack -T linker.ld -o yoursOS.bin boot.o kernel.o ahci.o nvme.o
+          mkdir -p isodir/boot/grub
+          cp yoursOS.bin isodir/boot/yoursOS.bin
+          cp grub.cfg isodir/boot/grub/grub.cfg
+          grub-mkrescue -o yoursOS.iso isodir
 
-    - name: Upload ISO Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: yoursOS-image
-        path: yoursOS.iso
+      - name: Upload ISO Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yoursOS-image
+          path: yoursOS.iso
