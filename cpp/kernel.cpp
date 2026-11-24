@@ -360,7 +360,7 @@ class Screen{
             *this << "/workspace/ ";
             Color(0x0A);
             *this << "$ ";
-            //RestoreColor();
+            RestoreColor();
             curr_pos_limit = curr_pos;
 
         }
@@ -601,7 +601,7 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
         if(text != 0){
             if(text == '\n'){
                 print << "\n";
-                cmd_buffer[buffer_index] = '\0'; //gotta go fast at this part so yeah,
+                cmd_buffer[buffer_index] = '\0'; //gotta go fast at this part so yeah,i'll copy and paste
                 if(buffer_index != 0){  
                     for(int i = 0; i < 7; i++){
                         if(cmd_buffer[i] != cmd_storage[i]){
