@@ -627,7 +627,7 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
            // }                               // char str[2] = {text, '\0'}; :( rip
            // else{
                // if(buffer_index < 31){
-                    cmd_buffer[buffer_index];
+                  //  cmd_buffer[buffer_index];
                //     buffer_index++;
                // }
             //} 
