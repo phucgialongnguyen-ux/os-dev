@@ -599,8 +599,8 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
     while(1){
         char text = Screen::Keyboard_Driver();
         if(text != 0){
-            //if(text == '\n'){
-                //print << "\n";
+            if(text == '\n'){
+                print << "\n";
                 //cmd_buffer[buffer_index] = '\0'; //gotta go fast at this part so yeah,i'll copy and paste
                 //if(buffer_index != 0){  
                 //    for(int i = 0; i < 7; i++){
@@ -630,7 +630,7 @@ extern "C" void kernel_main(unsigned long long pci_bar_addr, int drive_type) {
                   //  cmd_buffer[buffer_index];
                //     buffer_index++;
                // }
-            //} 
+            }
         }
     }
 }
